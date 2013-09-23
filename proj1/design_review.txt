@@ -1,0 +1,23 @@
+HOW TO MOVE KERNEL FROM DISK TO MEMORY
+
+Where to find kernel on disk?
+	Kernel is located right after bootloader (slide 5)
+
+Where to copy in memory?
+	0x1000 (slide 5)
+
+How to do the copying assembly?
+	using int $0x13. createimage informs the number of sectors to read. we read starting at track 0, and head 0. begin reading at sector that contains end of bootblock. drive should be already set. set bx to 0x1000
+
+Under what circumstances must bootloader be relocated?
+      if the kernel is more than 128 sectors in size you must move the bootloader.
+
+*******************************************************
+
+HOW TO CREATE THE DISK IMAGE
+
+Given an ELF, show how to use the header info to find where the first code segment begins:
+
+Show how to determine where in the image file this segment must be placed:
+
+Whoe where to write padding:
