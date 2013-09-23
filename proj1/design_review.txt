@@ -21,10 +21,11 @@ Under what circumstances must bootloader be relocated?
 HOW TO CREATE THE DISK IMAGE
 
 Given an ELF, show how to use the header info to find where the first code segment begins:
-	NOT CERTAIN	(ELF header size) + (Program Header Size)
-	(e_ehsize) + (
+	(assuming at least one program i.e. e_phnum > 0)
+	1st program occurs at (Program Header Start Offset + Program Header Size): e_phoff + e_phentsize
 
 Show how to determine where in the image file this segment must be placed:
+	see "Base Address" section of ELF documentation
 
 Where to write padding:
 	force padding by writing p_memsz > p_filesz
