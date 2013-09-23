@@ -1,13 +1,20 @@
 # Author(s): <Your name here>
 # COS 318, Fall 2013: Project 1 Bootloader
 # bootloader
-# Largely unimplemented
 
 # .equ symbol, expression
 # These directive set the value of the symbol to the expression
 # memory constants
 .equ  BOOT_SEGMENT,0x7c0
 # more memory constants...
+# TODO: remove unused constants
+.equ  BIOS_DATA,0x0
+.equ  VGA_DISPLAY,0xA000
+.equ  DEVICES,0xC000
+.equ  BIOS,0xF000
+.equ  TOP_OF_MEMORY,0x10000
+
+
 
 # utility constants
 .equ  DISK_READ,0x02
@@ -25,7 +32,23 @@
 #
 
 _start:
-	call print_string
+	
+	mov 0x0, %es
+	#set base pointer 
+	mov $VGA_DISPLAY, %bp
+	#set stack pointer
+	mov %bp, %sp
+
+
+	#print 'ABCD'
+	mov $0x40, %al
+	call print_char
+	mov $0x41, %al
+	call print_char
+	mov $0x42, %al
+	call print_char
+	mov $0x43, %al
+	call print_char
 	
 	ret
 	
