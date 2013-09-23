@@ -8,6 +8,10 @@ Where to copy in memory?
 
 How to do the copying assembly?
 	using int $0x13. createimage informs the number of sectors to read. we read starting at track 0, and head 0. begin reading at sector that contains end of bootblock. drive should be already set. set bx to 0x1000
+	
+	note that we cannot cross 64k segments in one 0x13 interrupt (in case we load from floppy drive).  need some code along the lines of:
+		if (read_start MOD 64k) != (read_end MOD 64k):
+			read_end = read_start MOD 64k + 64k
 
 Under what circumstances must bootloader be relocated?
       if the kernel is more than 128 sectors in size you must move the bootloader.
@@ -17,7 +21,11 @@ Under what circumstances must bootloader be relocated?
 HOW TO CREATE THE DISK IMAGE
 
 Given an ELF, show how to use the header info to find where the first code segment begins:
+	NOT CERTAIN	(ELF header size) + (Program Header Size)
+	(e_ehsize) + (
 
 Show how to determine where in the image file this segment must be placed:
 
-Whoe where to write padding:
+Where to write padding:
+	force padding by writing p_memsz > p_filesz
+	do this for convenient locations, force contiguous segments, etc
