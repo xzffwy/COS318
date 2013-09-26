@@ -24,7 +24,7 @@ KERNEL_ADDR	= 0x1000
 #
 #-Wall:			All of the `-W' options combined (all warnings on)
 
-CCOPTS = -Wall -g -m32 -c -fomit-frame-pointer -O2 -fno-builtin
+CCOPTS = -Wall -g -m32 -c -fomit-frame-pointer -fno-builtin
 
 # Linker flags
 #-nostartfiles:	Do not use the standard system startup files when linking.
