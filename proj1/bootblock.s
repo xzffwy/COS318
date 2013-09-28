@@ -34,61 +34,53 @@ os_size:
 # setup registers for kernel data and disk read	
 load_kernel:  	
 	#set bootloader stack segment
-	movw $0x0000, %ax
+	movw $0x9000, %ax
 	movw %ax, %ss
-	#set extra segment to 0
+	#set extra segment to 0x1000
+	movw $0x100, %ax
 	movw %ax, %es
 	#set bootloader base and stack pointer
-	mov $0xA0000, %eax
-	mov %eax, %ebp
-	mov %eax, %esp
+	movw $0xFFFF, %ax
+	movw %ax, %bp
+	movw %ax, %sp
 
+	#set data segment
+	movw %cs, %ax
+	movw %ax, %ds
 	#load kernel data
-	movb $0x02, %ah
-	movb os_size, %al #sectors to read = 128
-	movw $0x0001, %cx #cylinder = 0, sector = 1
+	# read number of sectors provided by createimage and specify for interrupt
+	movw $os_size, %si
+	lodsw
+
+	movb $DISK_READ, %ah
+
+
+	#set bios data segment
+	movw $0x0, %cx
+	movw %cx, %ds
+
+	movw $0x1, %cx #cylinder = 0, sector = 1
 	movb $0x00, %dh #head = 0, dl should be as it was set by BIOS
 
-	movw $0x1000, %bx #set write destination of kernel
+	movw $0x0, %bx #set write destination of kernel
 
-	enter $0, $0
 
 	int $0x13
-
-	leave
 
 
 # setup the kernel stack
 setup_stack:	
-	#set stack segment
-	movw $0x0000, %ax
-	movw %ax, %ss
-	#set base and stack pointer
-	movw $0xA000, %ax
-	movw %ax, %bp
-	movw %ax, %sp
+	#reset stack pointer
+	movw %bp, %sp
+	#set data segment
+
+	jmp end
 
 # switch control to kernel
 switch_to_kernel:
-	#set kernel data segment
-	movw $BOOT_SEGMENT, %ax
-	movw %ax, %ds
+	
 
 	#jump to kernel
-	ljmp 0x1000
+	ljmp $0x100, $0x0
 
-
-# print a character to screen at the position of the cursor. TODO: advance the cursor
-print_char:
-	push %ebx
-	
-	mov $0x0e,%ah #specify teletype
-	mov $0x00,%bh #page number
-	mov $0x02,%bl #color of foreground (white)
-
-	push %edx
-	int $0x10 #call interrupt
-	pop %edx
-		
-	pop %ebx
-	ret
+end:
