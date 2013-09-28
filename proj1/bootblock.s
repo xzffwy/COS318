@@ -36,34 +36,34 @@ load_kernel:
 	#set bootloader stack segment
 	movw $0x9000, %ax
 	movw %ax, %ss
-	#set extra segment to 0x1000
-	movw $0x100, %ax
-	movw %ax, %es
 	#set bootloader base and stack pointer
 	movw $0xFFFF, %ax
 	movw %ax, %bp
 	movw %ax, %sp
 
+	# # read drive params
+	# movb $0x08, %ah
+	# int $0x13
+
+
 	#set data segment
-	movw %cs, %ax
+	movw $BOOT_SEGMENT, %ax
 	movw %ax, %ds
 	#load kernel data
-	# read number of sectors provided by createimage and specify for interrupt
-	movw $os_size, %si
-	lodsw
 
-	movb $DISK_READ, %ah
-
-
-	#set bios data segment
+	#set extra segment to kernel write destination
 	movw $0x0, %cx
-	movw %cx, %ds
+	movw %cx, %es
 
 	movw $0x1, %cx #cylinder = 0, sector = 1
 	movb $0x00, %dh #head = 0, dl should be as it was set by BIOS
 
-	movw $0x0, %bx #set write destination of kernel
+	movw $0x1000, %bx #set write destination of kernel
 
+	# read number of sectors provided by createimage and specify for interrupt
+	# movb $0x09, %al
+	# movb $DISK_READ, %ah
+	movl $0x0209, %eax
 
 	int $0x13
 
@@ -72,13 +72,14 @@ load_kernel:
 setup_stack:	
 	#reset stack pointer
 	movw %bp, %sp
-	#set data segment
-
-	jmp end
 
 # switch control to kernel
 switch_to_kernel:
+
 	
+	#set data segment
+	movw $0x0, %ax
+	movw %ax, %ds
 
 	#jump to kernel
 	ljmp $0x100, $0x0
