@@ -60,7 +60,7 @@ bootblock_baseline: bootblock_baseline.o
 
 # Create an image with createimage.c and diff it with image_baseline
 baseline: bootblock_baseline createimage kernel
-	./createimage.given ./bootblock_baseline ./kernel
+	./createimage ./bootblock_baseline ./kernel
 	diff image_baseline image
 
 # Create an image to put on the floppy

@@ -20,33 +20,46 @@
 
 /* Reads in an executable file in ELF format*/
 Elf32_Phdr * read_exec_file(FILE **execfile, char *filename, Elf32_Ehdr **ehdr){
-  size_t numread;
+  size_t numread; //used for error checks
   Elf32_Phdr *phdr = malloc(sizeof(Elf32_Phdr)); //ELF Program header
   // TODO: error stuff
   
-  // read in ELF header i.e. read sizeof(Elf32_Ehdr) bytes into buffer ehdr
+  //open file
+  printf("Opening file %s\n", filename); //DEBUG
+  if(!(*execfile = fopen(filename, "r"))){
+    fprintf(stderr, "Error reading %s: %s\n", filename, strerror(errno));
+    exit(EXIT_FAILURE);
+  }
+
+  // read in ELF header
   numread = fread(*ehdr, 1, sizeof(Elf32_Ehdr), *execfile);  
   //TODO: error stuff
-
-  //Debug
-  printf("I think e_phentsize is %d", (**ehdr).e_phentsize);
+  //printf("I think e_phentsize is %d", (**ehdr).e_phentsize); //Debug
   
-  // populate fields
-  (*phdr).p_type = NULL;
-  (*phdr).p_offset = NULL;
-  (*phdr).p_vaddr = NULL;
-  (*phdr).p_paddr = NULL;
-  (*phdr).p_filesz = NULL;
-  (*phdr).p_memsz = NULL;
-  (*phdr).p_flags = NULL;
-  (*phdr).p_align = NULL;
+  // read in 1st program header
+  assert((**ehdr).e_phentsize == sizeof(Elf32_Phdr)); // check we're reading correct amount
+    //set read position to e_phoff
+  fseek(*execfile, (**ehdr).e_phoff, SEEK_SET);
+    // perform read
+  numread = fread(phdr, 1, sizeof(Elf32_Phdr), *execfile);
+  //TODO: error stuff
+  //printf("I think p_memsz for %s is %x\n", filename, (*phdr).p_memsz); //Debug
+  //printf("I think p_offset for %s is %x\n", filename, (*phdr).p_offset); //Debug
 
-  return NULL;
+  
+  return phdr;
 }
 
 /* Writes the bootblock to the image file */
+/* accepts headers as they were read in and modifies as appropriate */
 void write_bootblock(FILE **imagefile, FILE *bootfile, Elf32_Ehdr *boot_header, Elf32_Phdr *boot_phdr){
- 
+  /* write imagefile ELF header (ASSUME 2 PROGRAM ENTRIES)*/
+
+  /* write boot program_header */
+
+  /* leave space for kernel header */
+
+  /* write bootfile code */
 
 }
 
@@ -116,16 +129,14 @@ int main(int argc, char **argv){
 
   /* read executable bootblock file   
    *     note that here filename = argv[argc-2]; */
-  if(!(bootfile = fopen(argv[argc-2], "r"))){
-    fprintf(stderr, "Error reading %s: %s\n", argv[argc-2], strerror(errno));
-    exit(EXIT_FAILURE);
-  }
   boot_phdr = read_exec_file(&bootfile, argv[argc-2], &boot_header);
 
   /* write bootblock */  
   write_bootblock(&imagefile, bootfile, boot_header, boot_phdr);
 
-  /* read executable kernel file */
+  /* read executable kernel file
+   *     note that here filename = argv[argc-1]; */
+  kernel_phdr = read_exec_file(&kernelfile, argv[argc-1], &kernel_header);
 
   /* write kernel segments to image */
 
@@ -136,7 +147,7 @@ int main(int argc, char **argv){
 	/* print info */
   }
   
-  // TODO: destroy boot header, kernel_header, boot_program_header, kernel_program_header
+  // TODO: destroy boot_header, kernel_header, boot_phdr, kernel_phdr
   
   return 0;
 } // ends main()
