@@ -67,10 +67,15 @@ load_kernel:
 	subb %ah, %ah
 	pushw %ax
 
+	#reset stack base
+	movw %sp, %bp
+
 	# save boot drive
 	movw %dx, %ax
 	pushw %ax
 
+	leal %bp(,%ss,16), %eax
+	movw (%eax), %ax
 
 	jmp end
 
@@ -82,6 +87,7 @@ load_kernel:
 
 	# read number of sectors provided by createimage and specify for interrupt
 	movb os_size, %al
+	# specify interrupt function
 	movb $DISK_READ, %ah
 
 	# get the driver saved from earlier
