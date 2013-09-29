@@ -33,9 +33,14 @@ os_size:
 
 # setup registers for kernel data and disk read	
 load_kernel:  	
+	#set data segment
+	movw $BOOT_SEGMENT, %ax
+	movw %ax, %ds
+
 	#set bootloader stack segment
 	movw $0x9000, %ax
 	movw %ax, %ss
+
 	#set bootloader base and stack pointer
 	movw $0xFFFF, %ax
 	movw %ax, %bp
@@ -44,44 +49,38 @@ load_kernel:
 	# # read drive params
 	# movb $0x08, %ah
 	# int $0x13
-
-
-	#set data segment
-	movw $BOOT_SEGMENT, %ax
-	movw %ax, %ds
+	
 	#load kernel data
 
 	#set extra segment to kernel write destination
-	movw $0x0, %cx
-	movw %cx, %es
-
-	movw $0x1, %cx #cylinder = 0, sector = 1
-	movb $0x00, %dh #head = 0, dl should be as it was set by BIOS
-
-	movw $0x1000, %bx #set write destination of kernel
+	movw $0x100, %ax
+	movw %ax, %es
 
 	# read number of sectors provided by createimage and specify for interrupt
-	# movb $0x09, %al
-	# movb $DISK_READ, %ah
-	movl $0x0209, %eax
+	movb os_size, %al
+	movb $DISK_READ, %ah
+
+	# set data segment
+	movw $0x0, %cx
+	movw %cx, %ds
+
+	movw $0x2, %cx #cylinder = 0, sector = 1
+	movb $0x00, %dh #head = 0, dl should be as it was set by BIOS
+
+	movw $0x0, %bx #set write destination of kernel
 
 	int $0x13
 
-
 # setup the kernel stack
 setup_stack:	
-	#reset stack pointer
+	# reset stack pointer
 	movw %bp, %sp
 
 # switch control to kernel
 switch_to_kernel:
-
-	
-	#set data segment
+	# set data segment
 	movw $0x0, %ax
 	movw %ax, %ds
 
 	#jump to kernel
 	ljmp $0x100, $0x0
-
-end:
