@@ -1,4 +1,4 @@
-/* Author(s): <Your name here>
+/* Author(s): John McSpedon <mcspedon>, Rob Sami <rsami> 
  * COS 318, Fall 2013: Project 1 Bootloader
  * Creates operating system image suitable for placement on a boot disk
 */
@@ -20,25 +20,49 @@
 
 /* Reads in an executable file in ELF format*/
 Elf32_Phdr * read_exec_file(FILE **execfile, char *filename, Elf32_Ehdr **ehdr){
+  size_t numread;
+  Elf32_Phdr *phdr = malloc(sizeof(Elf32_Phdr)); //ELF Program header TODO:wrap in error check
+  
+  // read sizeof(Elf32_Ehdr) bytes into buffer ehdr
+  numread = fread(*ehdr, 1, sizeof(Elf32_Ehdr), *execfile);  
+  //TODO: error stuff
+
+  
+  // populate ehdr
+  ehdr
+
  
+  // read in elf header CHECK
+  numread = fread(&ehdr, sizeof(Elf32_Ehdr), &execfile)
+  
+  // populate fields
+  phdr.p_type = ;
+  phdr.p_offset = ;
+  phdr.p_vaddr = ;
+  phdr.p_paddr = ;
+  phdr.p_filesz = ;
+  phdr.p_memsz = ;
+  phdr.p_flags = ;
+  phdr.p_align = ;
+
   return NULL;
 }
 
 /* Writes the bootblock to the image file */
-void write_bootblock(FILE **imagefile,FILE *bootfile,Elf32_Ehdr *boot_header, Elf32_Phdr *boot_phdr){
+void write_bootblock(FILE **imagefile, FILE *bootfile, Elf32_Ehdr *boot_header, Elf32_Phdr *boot_phdr){
  
 
 }
 
 /* Writes the kernel to the image file */
-void write_kernel(FILE **imagefile,FILE *kernelfile,Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr){
+void write_kernel(FILE **imagefile, FILE *kernelfile, Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr){
 
  
 }
 
 /* Counts the number of sectors in the kernel */
 int count_kernel_sectors(Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr){
-   
+    
     return 0;
 }
 
@@ -68,6 +92,12 @@ void extended_opt(Elf32_Phdr *bph, int k_phnum, Elf32_Phdr *kph, int num_sec){
 /* MAIN */
 // ignore the --vm argument when implementing (project 1)
 int main(int argc, char **argv){
+ /* argv = (argc == 3/4)
+ * 	-/1: '--extended'
+ * 	1/2: './bootblock'
+ * 	2/3: './kernel'
+ */
+
   FILE *kernelfile, *bootfile,*imagefile;  //file pointers for bootblock,kernel and image
   Elf32_Ehdr *boot_header = malloc(sizeof(Elf32_Ehdr));//bootblock ELF header
   Elf32_Ehdr *kernel_header = malloc(sizeof(Elf32_Ehdr));//kernel ELF header
@@ -75,11 +105,29 @@ int main(int argc, char **argv){
   Elf32_Phdr *boot_program_header; //bootblock ELF program header
   Elf32_Phdr *kernel_program_header; //kernel ELF program header
 
-  /* create image file */
+  /* check for legal num of args */
+  if (argc != 3 && argc !=4) {
+	fprintf(stderr, "Error: call as '%s (--extended) bootblock-location kernel-location'\n", argv[0]);
+        exit(EXIT_FAILURE);
+  }
 
-  /* read executable bootblock file */  
+  /* create image file */
+  if(!(imagefile = fopen(IMAGE_FILE, 'w+')i)) {
+      fprintf(stderr, "Error creating %s: %s\n", IMAGE_FILE, strerror(errno));
+        exit(EXIT_FAILURE);
+  }
+
+
+  /* read executable bootblock file   
+   *     note that here filename = argv[argc-2]; */
+  if(!(bootfile = fopen(argv[argc-2], 'r'))){
+        fprintf(stderr, "Error reading %s: %s\n", argv[argc-2], strerror(errno));
+        exit(EXIT_FAILURE);
+  }
+  boot_phdr = read_exec_file(&execfile, argv[argc-2], &boot_header);
 
   /* write bootblock */  
+  write_bootblock(&imagefile, bootfile, boot_header, boot_phdr)
 
   /* read executable kernel file */
 
@@ -91,6 +139,8 @@ int main(int argc, char **argv){
   if(!strncmp(argv[1],"--extended",11)){
 	/* print info */
   }
+  
+  // TODO: destroy boot header, kernel_header, boot_program_header, kernel_program_header
   
   return 0;
 } // ends main()
