@@ -38,10 +38,16 @@ LDOPTS = -nostartfiles -nostdlib -melf_i386
 
 # Makefile targets
 
-all: bootblock createimage kernel image
+all: bootblock createimage kernel kernel-medium kernel-large image
 
 kernel: kernel.o
 	$(LD) $(LDOPTS) -Ttext $(KERNEL_ADDR) -o kernel $<
+
+kernel-medium: kernel-medium.o
+	$(LD) $(LDOPTS) -Ttext $(KERNEL_ADDR) -o kernel-medium $<
+
+kernel-large: kernel-large.o
+	$(LD) $(LDOPTS) -Ttext $(KERNEL_ADDR) -o kernel-large $<
 
 bootblock: bootblock.o
 	$(LD) $(LDOPTS) -Ttext 0x0 -o bootblock $<
@@ -49,14 +55,22 @@ bootblock: bootblock.o
 createimage: createimage.o
 	$(CC) -o createimage $<
 
+bootblock_baseline: bootblock_baseline.o
+	$(LD) $(LDOPTS) -Ttext 0x0 -o bootblock_baseline $<
+
+# Create an image with createimage.c and diff it with image_baseline
+baseline: bootblock_baseline createimage kernel
+	./createimage.given ./bootblock_baseline ./kernel
+	diff image_baseline image
+
 # Create an image to put on the floppy
-image: bootblock createimage kernel
+image: bootblock createimage kernel kernel-medium kernel-large
 	./createimage.given --extended ./bootblock ./kernel
 
 # Put the image on the usb stick (these two stages are independent, as both
 # vmware and bochs can run using only the image file stored on the harddisk)	
 boot: image
-	dd if=./image of=/dev/sdb bs=512
+	dd if=./image of=/dev/sdg bs=512
 
 # Clean up!
 clean:
