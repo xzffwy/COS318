@@ -1,0 +1,36 @@
+e_indent[16]: 457f 464c 0101 0001 0000 0000 0000 0000
+e_type: 0002 --executable
+e_machine; 0003 --intel 80386
+e_version; 0001 0000 --
+e_entry; 0000 0000 --virtual address to which the system transfers control. this value means there is no associated entry point.
+e_phoff; 0034 0000 --program header table's offset in bytes. CHECK
+e_shoff; 01d8 0000 --section header offset in bytes CHECK
+e_flags; 0000 0000 -- machine flags
+e_ehsize; 0034 -- ELF HEADER'S size in bytes
+e_phentsize; 0020  -- size in bytes of each entry in program header table
+e_phnum; 0001 -- holds number of entries in the program header table
+e_shentsize; 0028  --size of each entry in section header stable
+e_shnum; 0009 --number of entires in section header table
+e_shstrndx; 0006 --section header table index of the entry associated with the section name string table
+
+
+FIRST PROGRAM HEADER
+p_type; 0001 0000 -- pt_load
+p_offset; 0054 0000 --offset from beginning of file where 1st byte resides
+p_vaddr; 0000 0000 -- virtual address
+p_paddr; 0000 0000 -- physical address
+p_filesz; 0044 0000 -- num bytes in the file image of segment
+p_memsz; 0044 0000 -- num bytes in memory image on disk (padding)
+p_flags; 0005 0000 -- 
+p_align; 0004 0000 p_vaddr = p_offset mod p_align
+
+
+    
+     
+0000030     
+0000040    
+0000050  04eb 0000 0000 c0b8 8e07 b8d8
+0000060 9000 d08e ffb8 89ff 89c5 89c4 50d0 00b8
+0000070 8e01 a0c0 0002 02b4 8959 b6ca b900 0000
+0000080 d98e 02b9 bb00 0000 13cd ec89 00b8 8e00
+0000090 ead8 0000 0100 feeb 001c 0000 0002 0000
