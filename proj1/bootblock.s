@@ -46,10 +46,34 @@ load_kernel:
 	movw %ax, %bp
 	movw %ax, %sp
 
-	# # read drive params
-	# movb $0x08, %ah
-	# int $0x13
-	
+	# read drive params
+	movb $0x08, %ah
+	int $0x13
+
+	# save drive params
+	# sectors per track
+	movb %cl, %al
+	andw $0x1F, %ax
+	pushw %ax
+	# cylinders per head
+	movb %ch, %al
+	movb %cl, %ah
+	shrb $0x6, %ah
+	incw %ax
+	pushw %ax
+	# number of heads
+	movb %dh, %al
+	incb %al
+	subb %ah, %ah
+	pushw %ax
+
+	# save boot drive
+	movw %dx, %ax
+	pushw %ax
+
+
+	jmp end
+
 	#load kernel data
 
 	#set extra segment to kernel write destination
@@ -60,16 +84,21 @@ load_kernel:
 	movb os_size, %al
 	movb $DISK_READ, %ah
 
-	# set data segment
+	# get the driver saved from earlier
+	popw %cx
+	movw %cx, %dx
+	movb $0x00, %dh #head = 0
+
+	# set data segment for bios
 	movw $0x0, %cx
 	movw %cx, %ds
 
-	movw $0x2, %cx #cylinder = 0, sector = 1
-	movb $0x00, %dh #head = 0, dl should be as it was set by BIOS
+	movw $0x2, %cx #cylinder = 0, sector = 2
 
 	movw $0x0, %bx #set write destination of kernel
-
+	
 	int $0x13
+
 
 # setup the kernel stack
 setup_stack:	
@@ -84,3 +113,6 @@ switch_to_kernel:
 
 	#jump to kernel
 	ljmp $0x100, $0x0
+
+end:
+	jmp end
