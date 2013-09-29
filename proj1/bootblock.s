@@ -46,37 +46,9 @@ load_kernel:
 	movw %ax, %bp
 	movw %ax, %sp
 
-	# read drive params
-	movb $0x08, %ah
-	int $0x13
-
-	# save drive params
-	# sectors per track
-	movb %cl, %al
-	andw $0x1F, %ax
-	pushw %ax
-	# cylinders per head
-	movb %ch, %al
-	movb %cl, %ah
-	shrb $0x6, %ah
-	incw %ax
-	pushw %ax
-	# number of heads
-	movb %dh, %al
-	incb %al
-	subb %ah, %ah
-	pushw %ax
-
-	#reset stack base
-	movw %sp, %bp
-
 	# save boot drive
 	movw %dx, %ax
 	pushw %ax
-
-	movw %ss:%bp, %ax
-
-	jmp end
 
 	#load kernel data
 
