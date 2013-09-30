@@ -1,4 +1,4 @@
-# Author(s): <Your name here>
+# Author(s): Robert Sami, John McSpedon
 # COS 318, Fall 2013: Project 1 Bootloader
 # bootloader
 # Largely unimplemented

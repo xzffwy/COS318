@@ -47,7 +47,7 @@ _start:
   cmpw  %ax,result		
   jne  .L6		# If (trivialTest(1000) != 1000) goto L6
   pushw  $works			
-  jmp  .L12			
+  jmp  stackStressTest		
 .L6:    		# Test failed
   pushw  $not			
 .L12:
@@ -87,6 +87,25 @@ trivialTest:
   popw  %bp
   retw  		# Return (argument in ax)
   
+stackStressTest:
+  movl $0x100, %eax
+
+loop_top:
+  pushw %ax
+  decl %eax
+  cmpl $0x0,%eax
+  jne loop_top
+
+  movl $0x100, %eax
+
+loop_bottom:
+  popw %cx
+  decl %eax
+  cmpl $0x0,%eax
+  jne loop_bottom
+
+  jmp .L12
+
 displayString:
   pushw  %bp		# Setup stack frame
   movw  %sp,%bp
