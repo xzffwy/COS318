@@ -135,18 +135,42 @@ void record_kernel_sectors(FILE **imagefile, Elf32_Ehdr *kernel_header, Elf32_Ph
 
 /* Prints segment information for --extended option */
 void extended_opt(Elf32_Phdr *bph, int k_phnum, Elf32_Phdr *kph, int num_sec){
-  // assume we can hardcode names by piazza post @90
+  // have assumed we can hardcode names by piazza post @90
+  char *boot_fname = "./bootblock";
+  char *kernel_fname = "./kernel";
+  int pidx;
+  size_t sim_address;
 
   /* print number of disk sectors used by the image */
+  printf("image_size: %d sectors\n", num_sec);
   
   
   /*bootblock segment info */
+    //print address? and fname
+  pidx = 0;
+  printf("0x%4x:\t%s\n", bph[pidx].p_vaddr, boot_fname);
+  printf("\tsegment %d\n", pidx);
+  printf("\t\t offset 0x%4x\t\tvaddr 0x%4x\n", bph[pidx].p_offset, bph[pidx].p_vaddr);
+  printf("\t\t filesz 0x%4x\t\tmemsz 0x%4x\n", bph[pidx].p_filesz, bph[pidx].p_memsz);
+  printf("\t\t writing 0x%4x bytes\n", bph[pidx].p_filesz);
+  sim_address = ((bph[pidx].p_memsz - 1) / SECTOR_SIZE  + 1) * SECTOR_SIZE;
+  printf("\t\t padding up to 0x%4x\n", sim_address);
  
 
   /* print kernel segment info */
-  
+  printf("0x%4x:\t%s\n", kph[pidx].p_vaddr, kernel_fname);
+  for(pidx = 0; pidx < k_phnum; pidx++) {
+    printf("\tsegment %d\n", pidx);
+    printf("\t\t offset 0x%4x\t\tvaddr 0x%4x\n", kph[pidx].p_offset, kph[pidx].p_vaddr);
+    printf("\t\t filesz 0x%4x\t\tmemsz 0x%4x\n", kph[pidx].p_filesz, kph[pidx].p_memsz);
+    printf("\t\t writing 0x%4x bytes\n", kph[pidx].p_filesz);
+    sim_address += kph[pidx].p_memsz;
+    if (pidx == k_phnum -1) sim_address = ((sim_address - 1) / SECTOR_SIZE + 1) * SECTOR_SIZE;
+    printf("\t\t padding up to 0x%4x\n", sim_address);
+  }
 
   /* print kernel size in sectors */
+  printf("os_size: %d sectors\n", num_sec-1);
 }
 
 // more helper functions...
@@ -202,7 +226,7 @@ int main(int argc, char **argv){
 
   /* check for  --extended option */
   if(!strncmp(argv[1],"--extended",11)){
-	  extended_opt(boot_phdr, (int) (*kernel_header).e_phnum, kernel_phdr, num_sectors);
+	  extended_opt(boot_phdr, (int) (*kernel_header).e_phnum, kernel_phdr, num_sectors + 1);
   }
   
   // Free Memory
