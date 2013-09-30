@@ -1,7 +1,6 @@
 # Author(s): Robert Sami, John McSpedon
 # COS 318, Fall 2013: Project 1 Bootloader
 # bootloader
-# Largely unimplemented
 
 # .equ symbol, expression
 # These directive set the value of the symbol to the expression
