@@ -22,7 +22,7 @@ HOW TO CREATE THE DISK IMAGE
 
 Given an ELF, show how to use the header info to find where the first code segment begins:
 	(assuming at least one program i.e. e_phnum > 0)
-	1st program occurs at (Program Header Start Offset + Program Header Size): e_phoff + e_phentsize
+	1st program occurs at (Program Header Start Offset + Num headers * Program Header Size): e_phoff + e_phentsize
 
 Show how to determine where in the image file this segment must be placed:
 	see "Base Address" section of ELF documentation
