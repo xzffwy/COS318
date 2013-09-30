@@ -16,70 +16,46 @@
 
 #define SECTOR_SIZE 512       /* floppy sector size in bytes */
 #define BOOTLOADER_SIG_OFFSET 0x1fe /* offset for boot loader signature */
+#define KERNEL_SECTOR_OFFSET 2 /* offset for writing number of kernel sectors */
 // more defines...
+
+// private fxn called to write both bootblock and kernel
+void write_to_image(FILE **imagefile, FILE *readfile, Elf32_Ehdr *elf_hdr, Elf32_Phdr *prog_hdr);
 
 /* Reads in an executable file in ELF format*/
 Elf32_Phdr * read_exec_file(FILE **execfile, char *filename, Elf32_Ehdr **ehdr){
-  size_t numread; //used for error checks
-  Elf32_Phdr *phdr = malloc(sizeof(Elf32_Phdr)); //ELF Program header
-  // TODO: error stuff
+  size_t numread, num_phdr;
+  Elf32_Phdr *phdr; // return value
   
   //open file
-  printf("Opening file %s\n", filename); //DEBUG
   if(!(*execfile = fopen(filename, "r"))){
     fprintf(stderr, "Error reading %s: %s\n", filename, strerror(errno));
     exit(EXIT_FAILURE);
   }
-
   // read in ELF header
-  numread = fread(*ehdr, 1, sizeof(Elf32_Ehdr), *execfile);  //TODO: error stuff
-  //printf("I think e_phentsize is %d", (**ehdr).e_phentsize); //Debug
+  numread = fread(*ehdr, 1, sizeof(Elf32_Ehdr), *execfile);
+  assert(numread == sizeof(Elf32_Ehdr));
+  num_phdr = (**ehdr).e_phnum;
   
-  // read in 1st program header
-  assert((**ehdr).e_phentsize == sizeof(Elf32_Phdr)); // check we're reading correct amount
-    //set read position to e_phoff
+  /* read in program headers */
+    // check we're assuming correct struct
+  assert((**ehdr).e_phentsize == sizeof(Elf32_Phdr)); 
+    //set read position to beginning of program header table
   fseek(*execfile, (**ehdr).e_phoff, SEEK_SET);
+    // allocate memory to store program header(s)
+  phdr = calloc(sizeof(Elf32_Phdr), num_phdr); //ELF Program header
     // perform read
-  numread = fread(phdr, 1, sizeof(Elf32_Phdr), *execfile);  //TODO: error stuff
-  //printf("I think p_memsz for %s is %x\n", filename, (*phdr).p_memsz); //Debug
-  //printf("I think p_offset for %s is %x\n", filename, (*phdr).p_offset); //Debug
-
+  numread = fread(phdr, sizeof(Elf32_Phdr), num_phdr, *execfile);
+  assert(numread == num_phdr);
   
   return phdr;
 }
 
 /* Writes the bootblock to the image file */
 void write_bootblock(FILE **imagefile, FILE *bootfile, Elf32_Ehdr *boot_header, Elf32_Phdr *boot_phdr){
-  size_t required_padding; // amount of padding required to bring bootloader code to full sector size in image
-  size_t numremaining, num2read, numread; // number of bytes remaining to r/w, to r/w this turn, and r/w during this loop
-
-  char buffer[SECTOR_SIZE]; // buffer for copying a sector's worth of bytes
-
   /* set file offsets */
   fseek(*imagefile, 0, SEEK_SET);
-  fseek(bootfile, (*boot_phdr).p_offset, SEEK_SET); // this is where first byte of program resides
-
-  /* copy in bootloader code (p_filesz bytes) */
-  numremaining = (*boot_phdr).p_filesz;
-  required_padding = (SECTOR_SIZE - numremaining) % SECTOR_SIZE;
-      //printf("Hi. My file size is %d bytes and I need %d bytes of padding\n", numremaining, required_padding);
-  while(numremaining > 0) {
-    // read bytes   ( num2read = min(numremaining, SECTOR_SIZE) )
-    num2read = (numremaining < SECTOR_SIZE) ? numremaining : SECTOR_SIZE;
-    numread = fread(buffer, 1, num2read, bootfile);
-    assert(numread == num2read); //TODO
-    // write bytes
-    numread = fwrite(buffer, 1, num2read, *imagefile);
-    assert(numread == num2read); //TODO
-    // decrement counters
-    numremaining -= numread;
-  }
-
-  /* pad with zeroes up to 0x1fe */
-  while(required_padding > 0) {
-    fputc(0, *imagefile);
-    required_padding--;
-  }
+  write_to_image(imagefile, bootfile, boot_header, boot_phdr);
 
   /* write signature to end of first sector */
   fseek(*imagefile, BOOTLOADER_SIG_OFFSET, SEEK_SET);
@@ -89,79 +65,70 @@ void write_bootblock(FILE **imagefile, FILE *bootfile, Elf32_Ehdr *boot_header, 
 
 /* Writes the kernel to the image file */
 void write_kernel(FILE **imagefile, FILE *kernelfile, Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr){
-  size_t required_padding; // amount of padding required to bring kernel code to full sector size in image
-  size_t numremaining, num2read, numread; // number of bytes remaining to r/w, to r/w this turn, and r/w during this loop
-  char buffer[SECTOR_SIZE]; // buffer for copying a sector's worth of bytes
-
-
   /* set file offset to beginning of second segment */
   fseek(*imagefile, SECTOR_SIZE, SEEK_SET);
-  fseek(kernelfile, (*kernel_phdr).p_offset, SEEK_SET); // this is where first byte of program resides
+  write_to_image(imagefile, kernelfile, kernel_header, kernel_phdr); 
+}
 
-  /* copy kernel image (p_filesz bytes) */
-  numremaining = (*kernel_phdr).p_filesz;
-  required_padding = (SECTOR_SIZE - numremaining) % SECTOR_SIZE;
-      //printf("Hi. My file size is %d bytes and I need %d bytes of padding\n", numremaining, required_padding);
-  while(numremaining > 0) {
-    // read bytes   ( num2read = min(numremaining, SECTOR_SIZE) )
-    num2read = (numremaining < SECTOR_SIZE) ? numremaining : SECTOR_SIZE;
-    numread = fread(buffer, 1, num2read, kernelfile);
-    assert(numread == num2read); //TODO
-    // write bytes
-    numread = fwrite(buffer, 1, num2read, *imagefile);
-    assert(numread == num2read); //TODO
-    // decrement counters
-    numremaining -= numread;
-  }
-  
-  /* assumes imagefile is open at desired offset
-       for each program header, copies bytes then pads (memsz - progsize)
-       at end, pads to nearest sector */
-  void write_to_image(File **imagefile, File *readfile, Elf32_Ehdr *elf_hdr, Elf32_Phdr *prog_hdr) {
-    size_t required_padding; // amount of padding required to bring kernel code to full sector size in image
-    size_t totalread // total bytes read thusfar
-    size_t numremaining, num2read, numread; //for current pidx: number of bytes remaining to r/w, to r/w this turn, and r/w during this loop
-    
-    // for each program header
-    for(int pidx = 0; pidx < (*elf_hdr).e_phnum; pidx++) {
-      numremaining = prog_hdr[pidx].p_filesz;
-      required_padding = prog_hdr[pidx].memsz - numremaining;
-      fseek(readfile, prog_hdr[pidx].p_offset, SEEK_SET); // this is where first byte of program resides
+ /* NOTE: assumes imagefile is open at desired offset.
+    For each program header, copies code segment then pads (memsz - progsize) bytes.
+    At end, pads to nearest sector */
+void write_to_image(FILE **imagefile, FILE *readfile, Elf32_Ehdr *elf_hdr, Elf32_Phdr *prog_hdr) {
+  size_t required_padding; // padding (in bytes) required to bring write to the end of a sector in image
+  size_t totalread = 0; // total bytes read thusfar
+  size_t numremaining, num2read, numread; //for current pidx: number of bytes remaining to r/w, to r/w this turn, and to r/w during this loop
+  int pidx; //which program header we're on
+  char buffer[SECTOR_SIZE]; // buffer for copying a sector's worth of bytes
 
-      while(numremaining > 0) {
-        // read bytes   ( num2read = min(numremaining, SECTOR_SIZE) )
-        num2read = (numremaining < SECTOR_SIZE) ? numremaining : SECTOR_SIZE;
-        numread = fread(buffer, 1, num2read, readfile);
-        assert(numread == num2read); //TODO
-        // write bytes
-        numread = fwrite(buffer, 1, num2read, *imagefile);
-        assert(numread == num2read); //TODO
-        // decrement counters
-        numremaining -= numread;
-      }
+  // for each program header
+  for(pidx = 0; pidx < (*elf_hdr).e_phnum; pidx++) {
+    /* populate variables specific to this program header */
+    numremaining = prog_hdr[pidx].p_filesz;
+    required_padding = prog_hdr[pidx].p_memsz - numremaining;
+    fseek(readfile, prog_hdr[pidx].p_offset, SEEK_SET); // this is where first byte of program resides
 
+    /* copy code segment */
+    while(numremaining > 0) {
+      // read bytes   ( num2read = min(numremaining, SECTOR_SIZE) )
+      num2read = (numremaining < SECTOR_SIZE) ? numremaining : SECTOR_SIZE;
+      numread = fread(buffer, 1, num2read, readfile);
+      assert(numread == num2read);
+      // write bytes
+      numread = fwrite(buffer, 1, num2read, *imagefile);
+      assert(numread == num2read);
+      // update counters
+      totalread += numread;
+      numremaining -= numread;
     }
-
+    /* pad up to memsz */     
+    while(required_padding > 0) {
+      fputc(0, *imagefile);
+      required_padding--;
+      totalread++;
+    }
   }
-
   /* pad to next sector */
+  required_padding = (SECTOR_SIZE - totalread) % SECTOR_SIZE;
   while(required_padding > 0) {
     fputc(0, *imagefile);
     required_padding--;
   }
- 
 }
 
 /* Counts the number of sectors in the kernel */
-int count_kernel_sectors(Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr){
-  size_t kernel_size = (*kernel_phdr).p_filesz;
+int count_kernel_sectors(Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr) {
+  size_t kernel_size = 0;
+  int pidx;
+  for(pidx = 0; pidx < (*kernel_header).e_phnum; pidx++) {
+    kernel_size += kernel_phdr[pidx].p_memsz;
+  }
   return (int) kernel_size / SECTOR_SIZE + ((kernel_size % SECTOR_SIZE == 0)? 0 : 1);
 }
 
 /* Records the number of sectors in the kernel */
-void record_kernel_sectors(FILE **imagefile,Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr, int num_sec) {
+void record_kernel_sectors(FILE **imagefile, Elf32_Ehdr *kernel_header, Elf32_Phdr *kernel_phdr, int num_sec) {
     /* write over bytes 3-6 inclusive of file */
-    fseek(*imagefile, 2, SEEK_SET);  //TODO: make 2 a constant
+    fseek(*imagefile, KERNEL_SECTOR_OFFSET, SEEK_SET);
     fwrite(&num_sec, sizeof(int), 1, *imagefile);
 }
 
@@ -230,17 +197,15 @@ int main(int argc, char **argv){
 
   /* tell the bootloader how many sectors to read to load the kernel */
   num_sectors = count_kernel_sectors(kernel_header, kernel_phdr);
-  printf("My kernel image occupies %d sectors!\n", num_sectors);
   record_kernel_sectors(&imagefile, kernel_header, kernel_phdr, num_sectors);
 
 
   /* check for  --extended option */
   if(!strncmp(argv[1],"--extended",11)){
-    printf("Extend what?!?\n");
-//	  extended_opt(boot_phdr, (int) (*kernel_header).e_phnum, kernel_phdr, num_sectors);
+	  extended_opt(boot_phdr, (int) (*kernel_header).e_phnum, kernel_phdr, num_sectors);
   }
   
-  /*// Free Memory
+  // Free Memory
   free(boot_header);
   free(kernel_header);
   free(boot_phdr);
@@ -249,10 +214,7 @@ int main(int argc, char **argv){
   // Close Files
   fclose(kernelfile);
   fclose(bootfile);
-  fclose(imagefile);*/
+  fclose(imagefile);
   
   return 0;
 } // ends main()
-
-
-
