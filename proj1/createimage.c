@@ -138,7 +138,7 @@ void extended_opt(Elf32_Phdr *bph, int k_phnum, Elf32_Phdr *kph, int num_sec){
   // assume we can hardcode names by piazza post @90
 
   /* print number of disk sectors used by the image */
-
+  
   
   /*bootblock segment info */
  
