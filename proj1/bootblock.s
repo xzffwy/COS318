@@ -46,35 +46,8 @@ load_kernel:
 	movw %ax, %bp
 	movw %ax, %sp
 
-	#################
-	# read drive params
-	movb $0x08, %ah
-	int $0x13
-
-	# save drive params
-	# sectors per track
-	movb %cl, %al
-	andw $0x1F, %ax
-	pushw %ax
-	# cylinders per head
-	movb %ch, %al
-	movb %cl, %ah
-	shrb $0x6, %ah
-	incw %ax
-	pushw %ax
-	# number of heads
-	movb %dh, %al
-	incb %al
-	subb %ah, %ah
-	pushw %ax
-
-	#reset stack base
-	movw %sp, %bp
-	#################
-
-	# save boot drive
-	movw %dx, %ax
-	pushw %ax
+	# save boot drive number
+	pushw %dx
 
 	# move kernel
 	# set extra segment to new bootblock destination
@@ -87,9 +60,8 @@ load_kernel:
 	movb $DISK_READ, %ah
 
 	# get the driver saved from earlier
-	popw %cx
-	pushw %cx
-	movw %cx, %dx
+	popw %dx
+	pushw %dx
 	movb $0x00, %dh #head = 0
 
 	# set data segment for bios
@@ -107,30 +79,18 @@ load_kernel:
 
 write_kernel:
 
-	# load kernel data
+	#load kernel data
 
-	# set data segment
-	movw $0x9FD0, %ax
-	movw %ax, %ds
+	# set data segment for new kernel
+	movw $0x9FD0, %cx
+	movw %cx, %ds	
 
 	#set extra segment to kernel write destination
-	movw $0xFF, %ax
+	movw $0x100, %ax
 	movw %ax, %es
 
-	movw $0x10, %bx # set init write index of kernel
-
-	# increment os_size so we can conveniently start reading from first sector
-	incw os_size
-
-loop_load_kernel:
-	#compare os_size to max head sectors
-	cmpw os_size, 
-
-	# jump to below loop if less and begin writing 
-	jle
-
-	# read max number of sectors
-	movb ?????, %al
+	# read number of sectors provided by createimage and specify for interrupt
+	movb os_size, %al
 	# specify interrupt function
 	movb $DISK_READ, %ah
 
@@ -145,9 +105,9 @@ loop_load_kernel:
 
 	movw $0x2, %cx #cylinder = 0, sector = 2
 
-	int $0x13
+	movw $0x0, %bx #set write destination of kernel
 
-	jmp loop_load_kernel
+	int $0x13
 
 # setup the kernel stack
 setup_stack:	
@@ -162,6 +122,3 @@ switch_to_kernel:
 
 	#jump to kernel
 	ljmp $0x100, $0x0
-
-end:
-	jmp end
