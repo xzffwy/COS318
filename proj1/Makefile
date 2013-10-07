@@ -69,12 +69,12 @@ baseline: bootblock_baseline createimage kernel
 
 # Create an image to put on the floppy
 image: bootblock createimage kernel kernel-medium kernel-large
-	./createimage.given --extended ./bootblock ./kernel
+	./createimage --extended ./bootblock ./kernel
 
 # Put the image on the usb stick (these two stages are independent, as both
 # vmware and bochs can run using only the image file stored on the harddisk)	
 boot: image
-	dd if=./image of=/dev/sdc bs=512  #CHANGE THIS LINE AS NEEDED
+	dd if=./image of=/dev/sdg bs=512  #CHANGE THIS LINE AS NEEDED
 
 # Clean up!
 clean:
