@@ -3,6 +3,8 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#define NUM_REGISTERS 8
+
 #include "common.h"
 
 /* ENTRY_POINT points to a location that holds a pointer to kernel_entry */
@@ -24,7 +26,22 @@ enum {
     STACK_MAX = 0x20000,
 };
 
+typedef enum {
+	PROCESS_BLOCKED,
+	PROCESS_READY,
+	PROCESS_RUNNING,
+} process_state;
+
 typedef struct pcb {
+	uint32_t eax;
+	uint32_t ecx;
+	uint32_t edx;
+	uint32_t ebx;
+	uint32_t esp;
+	uint32_t ebp;
+	uint32_t esi;
+	uint32_t edi;
+	process_state state;
 } pcb_t;
 
 /* The task currently running */

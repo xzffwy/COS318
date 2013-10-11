@@ -5,6 +5,7 @@
 #include "scheduler.h"
 #include "th.h"
 #include "util.h"
+#include "queue.h"
 
 #include "tasks.c"
 
@@ -18,9 +19,25 @@ void _start(void)
     /* Set up the single entry-point for system calls */
     *ENTRY_POINT = &kernel_entry;
 
+    // declare these here in order for memory to be statically allocated since we dont have malloc
+    queue_t ready;
+    queue_t blocked;
+
+    queue_init(ready);
+    queue_init(blocked);
+
     clear_screen(0, 0, 80, 25);
 
     /* Initialize the pcbs and the ready queue */
+    int iProcessIndex;
+    int iStackTop = STACK_MIN;
+    for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
+    	iStackTop += STACK_SIZE;
+    	// TO-DO: push onto ready queue
+    	pcbs[iProcessIndex]->esp = iStackTop;
+    	pcbs[iProcessIndex]->ebp = iStackTop;
+    	pcbs[iProcessIndex]->state = PROCESS_READY;
+    }
 
     /* Schedule the first task */
     scheduler_count = 0;
@@ -29,4 +46,10 @@ void _start(void)
     /* We shouldn't ever get here */
     ASSERT(0);
 }
+
+/* This function will return an initialized PCB used for one process */
+pbc_t initBlock() {
+	return null;
+}
+
 
