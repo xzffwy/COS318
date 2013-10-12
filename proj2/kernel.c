@@ -31,12 +31,14 @@ void _start(void)
     /* Initialize the pcbs and the ready queue */
     int iProcessIndex;
     int iStackTop = STACK_MIN;
+    pcb_t pcbs[NUM_TASKS];
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	iStackTop += STACK_SIZE;
     	// TO-DO: push onto ready queue
     	pcbs[iProcessIndex]->esp = iStackTop;
     	pcbs[iProcessIndex]->ebp = iStackTop;
     	pcbs[iProcessIndex]->state = PROCESS_READY;
+    	pop(ready)
     }
 
     /* Schedule the first task */
@@ -47,9 +49,5 @@ void _start(void)
     ASSERT(0);
 }
 
-/* This function will return an initialized PCB used for one process */
-pbc_t initBlock() {
-	return null;
-}
 
 

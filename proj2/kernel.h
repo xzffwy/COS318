@@ -41,7 +41,6 @@ typedef struct pcb {
 	uint32_t ebp;
 	uint32_t esi;
 	uint32_t edi;
-	process_state state;
 } pcb_t;
 
 /* The task currently running */
