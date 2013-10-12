@@ -34,11 +34,12 @@ void _start(void)
     pcb_t pcbs[NUM_TASKS];
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	iStackTop += STACK_SIZE;
+
     	// TO-DO: push onto ready queue
     	pcbs[iProcessIndex]->esp = iStackTop;
     	pcbs[iProcessIndex]->ebp = iStackTop;
     	pcbs[iProcessIndex]->state = PROCESS_READY;
-    	pop(ready)
+    	pop(ready);
     }
 
     /* Schedule the first task */

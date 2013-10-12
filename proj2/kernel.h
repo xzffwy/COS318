@@ -41,6 +41,8 @@ typedef struct pcb {
 	uint32_t ebp;
 	uint32_t esi;
 	uint32_t edi;
+	uint32_t eip;
+	bool_t isKernel;
 } pcb_t;
 
 /* The task currently running */
