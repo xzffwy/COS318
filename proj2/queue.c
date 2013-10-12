@@ -48,6 +48,11 @@ void queue_init(queue_t queue) {
 	queue->isEmpty = TRUE;
 }
 
+/* Return the size of the queue */
+uint32_t queue_size(queue_t queue) {
+	return head - tail;
+}
+
 int main() {
 	queue_t queue;
 	queue = malloc(sizeof(queue_t));

@@ -16,8 +16,7 @@ void lock_init(lock_t * l)
     if (SPIN) {
         l->status = UNLOCKED;
     } else {
-        // owner = -1 i.e. free to be acquired
-        // queue_init(* blocked_queue)
+    	l->status = UNLOCKED;
     }
 }
 

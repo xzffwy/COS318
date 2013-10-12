@@ -4,7 +4,7 @@
 #define QUEUE_H
 
 #include "common.h"
-#include "tasks.h"
+#include "tasks.c"
 
 #define QUEUE_SIZE NUM_TASKS
 
@@ -23,5 +23,8 @@ uint32_t pop(queue_t queue);
 
 /* Initialize the queue */
 void queue_init(queue_t queue);
+
+/* Return the size of the queue */
+void queue_size(queue_t queue);
 
 #endif                          /* QUEUE_H */

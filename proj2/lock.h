@@ -9,8 +9,6 @@ typedef struct {
         UNLOCKED,
         LOCKED,
     } status;
-    queue_t blocked;
-    uint32_t owner;
 } lock_t;
 
 void lock_init(lock_t *);
