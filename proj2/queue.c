@@ -6,14 +6,14 @@
 #include "util.h"
 
 /* Push the pcb for a task onto the queue. Return true if successful, or false if full */
-bool_t push(queue_t queue, pcb_t pcb) {
+bool_t push(queue_t queue, uint32_t pcbID) {
 	// If the queue is full, return false
 	if (!queue->isEmpty && (queue->head == queue->tail)) {
 		return FALSE;
 	}
 
 	// push the pcb
-	queue->pcbs[queue->tail] = pcb;
+	queue->pcbIDs[queue->tail] = pcbID;
 	// set new tail
 	queue->tail++;
 	queue->tail %= QUEUE_SIZE;
@@ -22,13 +22,13 @@ bool_t push(queue_t queue, pcb_t pcb) {
 }
 
 /* Pop a pcb for a task off of the queue. */
-pcb_t pop(queue_t queue) {
+uint32_t pop(queue_t queue) {
 	// If the queue is empty, return null
 	if (queue->isEmpty) {
 		return null;
 	}
 
-	pcb_t oPopped = queue->pcbs[queue->head];
+	pcb_t oPopped = queue->pcbIDs[queue->head];
 
 	// set new head
 	queue->head++;
