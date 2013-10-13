@@ -3,15 +3,14 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#define QUEUE_SIZE 5 //TODO: define this dynamically!!!
-
 #include "kernel.h"
 
 typedef struct queue {
-	pcb_t *pcbs[QUEUE_SIZE]; //array of pcb_t pointers
 	uint32_t head;
 	uint32_t tail;
 	bool_t isEmpty;
+	pcb_t **pcbs; //array of pcb_t pointers
+	uint32_t capacity;
 } *queue_t;
 
 

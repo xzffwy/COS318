@@ -14,7 +14,7 @@ bool_t queue_push(queue_t queue, pcb_t *pcb) {
 	queue->pcbs[queue->tail] = pcb;
 	// set new tail
 	queue->tail++;
-	queue->tail %= QUEUE_SIZE;
+	queue->tail %= queue->capacity;
 	queue->isEmpty = FALSE; // manage isEmpty
 
 	return TRUE;
@@ -31,7 +31,7 @@ pcb_t* queue_pop(queue_t queue) {
 
 	// set new head
 	queue->head++;
-	queue->head %= QUEUE_SIZE;
+	queue->head %= queue->capacity;
 	// track whether queue was just made empty
 	if (queue->head == queue->tail) {
 		queue->isEmpty = TRUE;
@@ -52,7 +52,7 @@ uint32_t queue_size(queue_t queue) {
 	uint32_t head = queue->head;
 	uint32_t tail = queue->tail;
 	return (queue->isEmpty) ? 0 : 
-						(head < tail) ? tail-head : tail + QUEUE_SIZE - head;
+						(head < tail) ? tail-head : tail + queue->capacity - head;
 }
 
 /* DEBUG
