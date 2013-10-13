@@ -9,11 +9,14 @@
 
 	.globl	kernel_entry
 kernel_entry:
-	movl 8(%esp), %eax
+	movl 4(%esp), %eax
 	# do_yield if eax is 0
 	cmpl $0x0, %eax
 	jne exit_process
+	pushl %ebp
+	movl %esp, %ebp
 	call do_yield
+	popl %ebp
 	ret
 exit_process:
 	# we're assuming that if %eax is not 0, then it is 1
@@ -55,22 +58,22 @@ scheduler_entry:
 	ret
 
 # Saves the pcb of the currently running process. Use EIP from two stack calls up (should be esp + 8)
-	.globl save_pcb
-save_pcb:
-	xchg %bx,%bx
+
+
+	.globl save_pcb_proc
+save_pcb_proc:
 	# push all the registers on the stack
 	pushal
-save_pcb1:
-	xchg %bx,%bx
+
 	# save eip
 	movl 4(%ebp), %ecx
 	movl current_running, %eax
 	movl %ecx, (%eax)
-save_pcb2:
+
 	# save correct esp from where do_yield. use the eflags entry as temp storage
 	leal 8(%ebp), %ecx
 	movl %ecx, 4(%eax)
-save_pcb3:
+
 	# restore registers
 	popal
 	# save old stack pointer
@@ -79,26 +82,80 @@ save_pcb3:
 	pushl %ebp
 	# set base pointer to esp
 	movl %esp, %ebp
-save_pcb4:
+
 	# set stack to current_address at where eax should be
 	movl current_running, %esp
 	leal 40(%esp), %esp
-save_pcb5:
+
 	# save registers
 	pushal
-save_pcb6:
+
 	# move esp value stored in eflags spot to correct esp spot
 	movl current_running, %esp
 	movl 4(%esp), %eax
 	movl %eax, 20(%esp)
-save_pcb7:
+
+	# store correct ebp value
+	movl (%ebp), %eax
+	movl (%eax), %eax
+	movl %eax, 16(%esp)
+
+	# save eflags
+	leal 8(%esp), %esp
+	pushfl
+
+	# set stack back
+	movl %ebp, %esp
+	movl (%ebp), %ebp
+	popl %eax
+	popl %esp
+
+save_p1:
+
+	ret
+
+	.globl save_pcb_thread
+save_pcb_thread:
+	# push all the registers on the stack
+	pushal
+
+	# save eip
+	movl 4(%ebp), %ecx
+	movl current_running, %eax
+	movl %ecx, (%eax)
+
+	# save correct esp from where do_yield. use the eflags entry as temp storage
+	leal 8(%ebp), %ecx
+	movl %ecx, 4(%eax)
+
+	# restore registers
+	popal
+	# save old stack pointer
+	pushl %esp
+	# save old base pointer
+	pushl %ebp
+	# set base pointer to esp
+	movl %esp, %ebp
+
+	# set stack to current_address at where eax should be
+	movl current_running, %esp
+	leal 40(%esp), %esp
+
+	# save registers
+	pushal
+
+	# move esp value stored in eflags spot to correct esp spot
+	movl current_running, %esp
+	movl 4(%esp), %eax
+	movl %eax, 20(%esp)
+
 	# store correct ebp value
 	movl (%ebp), %eax
 	movl (%eax), %eax
 	movl %eax, 16(%esp)
 save_pcb8:
 	# save eflags
-	leal 8(%esp), %esp  # J: subtract off 4?
+	leal 8(%esp), %esp
 	pushfl
 save_pcb9:
 	# set stack back

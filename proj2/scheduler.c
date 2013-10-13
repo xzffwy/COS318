@@ -30,7 +30,12 @@ void scheduler(void)
 void do_yield(void)
 {
 	// call save_pcb, which should find the EIP from above the base pointer
-	save_pcb();
+	if (current_running->isKernel) {
+		save_pcb_thread();
+	}
+	else {
+		save_pcb_proc();
+	}
 
 	// set pcb state
 	current_running->state = PROCESS_READY;
@@ -56,7 +61,12 @@ void do_exit(void)
 
 void block(void)
 {
-	save_pcb();
+	if (current_running->isKernel) {
+		save_pcb_thread();
+	}
+	else {
+		save_pcb_proc();
+	}
 
 	current_running->state = PROCESS_BLOCKED;
 
