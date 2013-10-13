@@ -4,7 +4,7 @@
 
 #define MAXROW 25
 
-uint64_t recorded_time;
+uint64_t rec_time;
 char * display_str = "Cycles required per do_yield(): ";
 
 
@@ -15,17 +15,17 @@ char * display_str = "Cycles required per do_yield(): ";
 
 void thread4(void)
 {
-	recorded_time = get_timer();
+	rec_time = get_timer();
 	do_yield();
 	do_exit();
 }
 
 void thread5(void)
 {
-	recorded_time = get_timer() - recorded_time;
+	rec_time = get_timer() - rec_time;
 
 	print_str(MAXROW-2, 0, display_str);
-	print_int(MAXROW-2, strlen(display_str), (int) recorded_time);
+	print_int(MAXROW-2, strlen(display_str), (int) rec_time);
 
 	do_exit();
 }
