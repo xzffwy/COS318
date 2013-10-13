@@ -10,6 +10,8 @@
 #include "tasks.c"
 
 pcb_t *current_running;
+queue_t ready_queue;
+queue_t blocked_queue;
 
 /* This function is the entry point for the kernel
  * It must be the first function in the file

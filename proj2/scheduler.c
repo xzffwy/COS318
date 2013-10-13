@@ -8,17 +8,12 @@
 
 int scheduler_count;
 
-/* Declare queues here */
-queue_t blocked;
-queue_t ready;
-
-
 void scheduler(void)
 {
     ++scheduler_count;
 
     // pop new pcb off ready queue
-    current_running = queue_pop(ready);
+    current_running = queue_pop(ready_queue);
 
     // if ret of pop is null, then all tasks have exited so just loop forever
     while (!current_running){ ; }
@@ -37,7 +32,7 @@ void do_yield(void)
 	save_pcb();
 
 	// push the currently running process on ready queue
-	queue_push(ready, current_running);
+	queue_push(ready_queue, current_running);
 
 	// call scheduler_entry
 	scheduler_entry();
@@ -57,7 +52,7 @@ void block(void)
 
 	save_pcb();
 
-	queue_push(blocked, current_running);
+	queue_push(blocked_queue, current_running);
 
 	scheduler_entry();
 
@@ -67,15 +62,15 @@ void block(void)
 
 void unblock(void)
 {
-	pcb_t *unblocked = queue_pop(blocked);
+	pcb_t *unblocked = queue_pop(blocked_queue);
 	if (!unblocked)
 		return;
 
 	unblocked->state = PROCESS_READY;
-	queue_push(ready, unblocked);
+	queue_push(ready_queue, unblocked);
 }
 
 bool_t blocked_tasks(void)
 {
-	return !blocked->isEmpty;
+	return !blocked_queue->isEmpty;
 }

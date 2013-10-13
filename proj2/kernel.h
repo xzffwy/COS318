@@ -50,9 +50,6 @@ typedef struct pcb {
 /* The task currently running */
 extern pcb_t *current_running;
 
-/* The number of tasks initialized in the kernel */
-extern uint32_t num_tasks;
-
 void kernel_entry(int fn);
 
 #endif                          /* KERNEL_H */

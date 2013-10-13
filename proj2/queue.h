@@ -5,6 +5,8 @@
 
 #define QUEUE_SIZE 1 //TODO: define this dynamically!!!
 
+#include "kernel.h"
+
 typedef struct queue {
 	pcb_t *pcbs[QUEUE_SIZE]; //array of pcb_t pointers
 	uint32_t head;

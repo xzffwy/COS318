@@ -6,7 +6,7 @@ lock.o: lock.c common.h lock.h scheduler.h kernel.h queue.h
 process1.o: process1.c common.h syslib.h util.h
 process2.o: process2.c common.h syslib.h util.h
 process3.o: process3.c common.h syslib.h util.h
-queue.o: queue.c queue.h common.h
+queue.o: queue.c queue.h kernel.h common.h
 scheduler.o: scheduler.c common.h kernel.h scheduler.h queue.h util.h
 tasks.o: tasks.c
 th1.o: th1.c scheduler.h common.h kernel.h queue.h th.h util.h
