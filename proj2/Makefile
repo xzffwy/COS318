@@ -33,6 +33,8 @@ CFLAGS += -DKERNEL_ADDR=$(KERNEL_ADDR)
 CFLAGS += -DPROC1_ADDR=$(PROC1_ADDR)
 CFLAGS += -DPROC2_ADDR=$(PROC2_ADDR)
 CFLAGS += -DPROC3_ADDR=$(PROC3_ADDR)
+# Add debug flag
+CFLAGS += -g
 
 ## Linker flags
 # Don't use the standard startup files or libraries

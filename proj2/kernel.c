@@ -37,7 +37,6 @@ void _start(void)
     pcb_t *process = &pcbs[0];
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	iStackTop += STACK_SIZE;
-    	process++;
 
     	struct task_info *thisTask = task[iProcessIndex];
 
@@ -47,6 +46,7 @@ void _start(void)
     	process->eip = thisTask->entry_point;
     	// TO-DO: maybe consider thread type?
     	queue_push(ready_queue, process);
+    	process++;
     }
 
     /* Schedule the first task */
