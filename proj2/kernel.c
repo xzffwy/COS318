@@ -4,7 +4,7 @@
 #include "kernel.h"
 #include "scheduler.h"
 #include "th.h"
-#include "util.h"
+#include "util.h" //DEBUG
 #include "queue.h"
 
 #include "tasks.c"
@@ -35,18 +35,34 @@ void _start(void)
     int iStackTop = STACK_MIN;
     pcb_t pcbs[NUM_TASKS];
     pcb_t *process = &pcbs[0];
+    print_str(0, 0, "welcome to the kernel, bitch"); //DEBUG
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
-    	iStackTop += STACK_SIZE;
+    	
 
     	struct task_info *thisTask = task[iProcessIndex];
 
+        iStackTop += STACK_SIZE;
     	process->esp = iStackTop;
     	process->ebp = iStackTop;
     	process->state = PROCESS_READY;
     	process->eip = thisTask->entry_point;
+        process->eax = 0;
+        process->ebx = 0;
+        process->ecx = 0;
+        process->edx = 0;
+        process->edi = 0;
+        process->esi = 0;
+        process->eflags = 0;
+
     	// TO-DO: maybe consider thread type?
     	queue_push(ready_queue, process);
+
+        print_str(iProcessIndex+1, 0, "new process with instruction pointer "); //DEBUG
+        print_hex(iProcessIndex+1, 37, process->eip);
+
     	process++;
+
+
     }
 
     /* Schedule the first task */

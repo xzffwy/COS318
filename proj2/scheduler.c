@@ -14,6 +14,8 @@ void scheduler(void)
 
     // pop new pcb off ready queue
     current_running = queue_pop(ready_queue);
+    print_str(5, 0, "just popped a task with eip "); //DEBUG
+    print_hex(6, 0, current_running->eip);
 
     // if ret of pop is null, then all tasks have exited so just loop forever
     while (!current_running){ ; }

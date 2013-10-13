@@ -101,7 +101,7 @@ clean :
 # Dependency management
 depend : .depend
 .depend :
-	$(CC) -MM *.c *.S > $@
+	$(CC) -MM -g *.c *.S > $@
 .PHONY : depend
 
 

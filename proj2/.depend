@@ -3,6 +3,7 @@ hello1.o: hello1.c
 kernel.o: kernel.c common.h kernel.h scheduler.h queue.h th.h util.h \
  tasks.c
 lock.o: lock.c common.h lock.h scheduler.h kernel.h queue.h
+malloc_queue.o: malloc_queue.c queue.h kernel.h common.h
 process1.o: process1.c common.h syslib.h util.h
 process2.o: process2.c common.h syslib.h util.h
 process3.o: process3.c common.h syslib.h util.h
