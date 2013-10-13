@@ -46,7 +46,7 @@ typedef struct pcb {
 	uint32_t eax;
 	bool_t isKernel;
 	process_state state;
-} pcb_t;
+} pcb_t; // potentially add packed attribute
 
 /* The task currently running */
 extern pcb_t *current_running;

@@ -33,7 +33,7 @@ void _start(void)
     /* Initialize the pcbs and the ready queue */
     int iProcessIndex;
     int iStackTop = STACK_MIN;
-    pcb_t pcbs[NUM_TASKS];
+    static pcb_t pcbs[NUM_TASKS];
     pcb_t *process = &pcbs[0];
     print_str(0, 0, "welcome to the kernel, bitch"); //DEBUG
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {

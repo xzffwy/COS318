@@ -29,14 +29,14 @@ void scheduler(void)
 
 void do_yield(void)
 {
-	// call save_pcb, which should find the EIP from two calls up
+	// call save_pcb, which should find the EIP from above the base pointer
 	save_pcb();
 
 	// set pcb state
 	current_running->state = PROCESS_READY;
-	print_str(8, 0, "just saved a thread with eip: "); //DEBUG
-    print_hex(8, 30, current_running->eip); //DEBUG
-    while(1) {;} //DEBUG
+
+	print_str(8, 0, "just saved a task with eip "); //DEBUG
+    print_hex(9, 0, current_running->eip);
 
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);
