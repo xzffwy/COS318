@@ -12,6 +12,8 @@
 pcb_t *current_running;
 queue_t ready_queue;
 queue_t blocked_queue;
+pcb_t *ready_arr[NUM_TASKS];
+pcb_t *blocked_arr[NUM_TASKS];
 
 /* This function is the entry point for the kernel
  * It must be the first function in the file
@@ -22,10 +24,15 @@ void _start(void)
     *ENTRY_POINT = &kernel_entry;
 
     struct queue ready_q;
-    struct queue blocked_q;
     ready_queue = &ready_q;
-    blocked_queue = &blocked_q;
+    ready_queue->pcbs = ready_arr;
+    ready_queue->capacity = NUM_TASKS;
     queue_init(ready_queue);
+
+    struct queue blocked_q;
+    blocked_queue = &blocked_q;
+    blocked_queue->pcbs = blocked_arr;
+    blocked_queue->capacity = NUM_TASKS;
     queue_init(blocked_queue);
 
     clear_screen(0, 0, 80, 25);
@@ -37,8 +44,6 @@ void _start(void)
     pcb_t *process = &pcbs[0];
     print_str(0, 0, "welcome to the kernel, bitch"); //DEBUG
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
-    	
-
     	struct task_info *thisTask = task[iProcessIndex];
 
         iStackTop += STACK_SIZE;
@@ -62,8 +67,6 @@ void _start(void)
         print_hex(iProcessIndex+1, 37, process->eip);*/
 
     	process++;
-
-
     }
 
     /* Schedule the first task */
