@@ -8,7 +8,7 @@
 #include "scheduler.h"
 
 enum {
-    SPIN = TRUE,
+    SPIN = FALSE,
 };
 
 void lock_init(lock_t * l)
@@ -28,12 +28,14 @@ void lock_acquire(lock_t * l)
         l->status = LOCKED;
     } else {
         // case 1: lock is free
-        if (l->status == UNLOCKED)
+        if (l->status == UNLOCKED) {
+            l->status = LOCKED;
             return;
+        }
         // case 2: lock is owned
         //CHECK THIS.  WILL IT SAVE EIP PROPERLY?  WILL IT JUMP TO NEW TASK?
+        print_str(18, 0, "wtf I just got lock-blocked");
         block();
-
 
         // if owner is -1 or status = UNBLOCKED -> lock_owner = running_task from kernel.c, status=BLOCKED, return
         // if owner is running_task, then wtf owner u crazy r sumtin?, i guess return
@@ -47,7 +49,7 @@ void lock_release(lock_t * l)
         l->status = UNLOCKED;
     } else {
         // check for blocked tasks
-        if (blocked_tasks)
+        if (blocked_tasks())
             unblock();
         // if none, free lock
         else

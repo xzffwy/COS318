@@ -3,7 +3,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#define QUEUE_SIZE 1 //TODO: define this dynamically!!!
+#define QUEUE_SIZE 5 //TODO: define this dynamically!!!
 
 #include "kernel.h"
 
