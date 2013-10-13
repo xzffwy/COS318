@@ -33,20 +33,25 @@ typedef enum {
 } process_state;
 
 typedef struct pcb {
-	uint32_t eax;
-	uint32_t ecx;
-	uint32_t edx;
-	uint32_t ebx;
-	uint32_t esp;
-	uint32_t ebp;
-	uint32_t esi;
-	uint32_t edi;
 	uint32_t eip;
+	uint32_t eflags;
+	uint32_t edi;
+	uint32_t esi;
+	uint32_t ebp;
+	uint32_t esp;
+	uint32_t ebx;
+	uint32_t edx;
+	uint32_t ecx;
+	uint32_t eax;
 	bool_t isKernel;
+	process_state state;
 } pcb_t;
 
 /* The task currently running */
 extern pcb_t *current_running;
+
+/* The number of tasks initialized in the kernel */
+extern uint32_t num_tasks;
 
 void kernel_entry(int fn);
 

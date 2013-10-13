@@ -9,10 +9,16 @@
 /* Number of times scheduler() was called */
 extern int scheduler_count;
 
+extern queue_t ready_queue;
+extern queue_t blocked_queue;
+
 /* Save the context and the kernel stack before calling scheduler
  * This function is implemented in entry.S
  */
 void scheduler_entry(void);
+
+/* Save the context of the current running thread */
+void save_pcb(void);
 
 /* Change current_running to the next task */
 void scheduler(void);

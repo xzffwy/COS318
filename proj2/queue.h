@@ -3,7 +3,7 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#define QUEUE_SIZE 5 //TODO: define this dynamically!!!
+#define QUEUE_SIZE 1 //TODO: define this dynamically!!!
 // DEBUG #define QUEUE_SIZE 5
 
 typedef struct queue *queue_t;

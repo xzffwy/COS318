@@ -11,6 +11,11 @@
 
 pcb_t *current_running;
 
+uint32_t num_tasks = NUM_TASKS;
+
+struct queue ready_q;
+struct queue blocked_q;
+
 /* This function is the entry point for the kernel
  * It must be the first function in the file
  */
@@ -19,12 +24,10 @@ void _start(void)
     /* Set up the single entry-point for system calls */
     *ENTRY_POINT = &kernel_entry;
 
-    // declare these here in order for memory to be statically allocated since we dont have malloc
-    queue_t ready;
-    queue_t blocked;
-
-    queue_init(ready);
-    queue_init(blocked);
+    ready_queue = &ready_q;
+    blocked_queue = &blocked_q;
+    queue_init(ready_queue);
+    queue_init(blocked_queue);
 
     clear_screen(0, 0, 80, 25);
 
@@ -32,14 +35,19 @@ void _start(void)
     int iProcessIndex;
     int iStackTop = STACK_MIN;
     pcb_t pcbs[NUM_TASKS];
+    pcb_t *process = &pcbs[0];
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	iStackTop += STACK_SIZE;
+    	process++;
 
-    	// TO-DO: push onto ready queue
-    	pcbs[iProcessIndex]->esp = iStackTop;
-    	pcbs[iProcessIndex]->ebp = iStackTop;
-    	pcbs[iProcessIndex]->state = PROCESS_READY;
-    	pop(ready);
+    	task_info *thisTask = task[iProcessIndex];
+
+    	process->esp = iStackTop;
+    	process->ebp = iStackTop;
+    	process->state = PROCESS_READY;
+    	process->eip = thisTask->entry_point;
+    	// TO-DO: maybe consider thread type?
+    	queue_push(ready_queue, process);
     }
 
     /* Schedule the first task */

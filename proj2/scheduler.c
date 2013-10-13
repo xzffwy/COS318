@@ -12,41 +12,70 @@ int scheduler_count;
 queue_t blocked;
 queue_t ready;
 
+
 void scheduler(void)
 {
     ++scheduler_count;
 
-    if (!blocked_tasks()) {
-    	while(1);
-    }
-
     // pop new pcb off ready queue
+    current_running = queue_pop(ready);
 
-    // if ret of pop is null, then all tasks have exited (TO-DO : can blocked queue ever not be empty here? DONE: exit releases lock) so just loop forever
+    // if ret of pop is null, then all tasks have exited so just loop forever
+    while (!current_running){ ; }
+
+    current_running->state = PROCESS_RUNNING;
 
     // return to scheduler_entry
 }
 
 void do_yield(void)
 {
-	// push the currently running process on ready queue
+	// set pcb state
+	current_running->state = PROCESS_READY;
 
-	// go-to scheduler_entry
+	// call save_pcb, which should find the EIP from two calls up
+	save_pcb();
+
+	// push the currently running process on ready queue
+	queue_push(ready, current_running);
+
+	// call scheduler_entry
+	scheduler_entry();
+
+	// shouldn't get here i don't think
+	ASSERT(0);
 }
 
 void do_exit(void)
 {
-	// release any locks
+	scheduler_entry();
 }
 
 void block(void)
 {
+	current_running->state = PROCESS_BLOCKED;
+
+	save_pcb();
+
+	queue_push(blocked, current_running);
+
+	scheduler_entry();
+
+	// shouldn't get here i don't think
+	ASSERT(0);
 }
 
 void unblock(void)
 {
+	pcb_t *unblocked = queue_pop(blocked);
+	if (!unblocked)
+		return;
+
+	unblocked->state = PROCESS_READY;
+	queue_push(ready, unblocked);
 }
 
 bool_t blocked_tasks(void)
 {
+	return !blocked->isEmpty;
 }
