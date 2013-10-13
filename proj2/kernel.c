@@ -53,6 +53,7 @@ void _start(void)
         process->edi = 0;
         process->esi = 0;
         process->eflags = 0;
+        process->isKernel = (thisTask->task_type == KERNEL_THREAD) ? TRUE : FALSE;
 
     	// TO-DO: maybe consider thread type?
     	queue_push(ready_queue, process);
