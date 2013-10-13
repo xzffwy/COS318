@@ -1,34 +1,40 @@
 /* queue.c */
 
+#include "queue.h"
 #include "common.h"
-#include "scheduler.h"
-#include "th.h"
-#include "util.h"
+
+struct queue {
+	pcb_t *pcbs[QUEUE_SIZE]; //array of pcb_t pointers
+	uint32_t head;
+	uint32_t tail;
+	bool_t isEmpty;
+};
 
 /* Push the pcb for a task onto the queue. Return true if successful, or false if full */
-bool_t push(queue_t queue, uint32_t pcbID) {
+bool_t queue_push(queue_t queue, pcb_t *pcb) {
 	// If the queue is full, return false
 	if (!queue->isEmpty && (queue->head == queue->tail)) {
 		return FALSE;
 	}
 
 	// push the pcb
-	queue->pcbIDs[queue->tail] = pcbID;
+	queue->pcbs[queue->tail] = pcb;
 	// set new tail
 	queue->tail++;
 	queue->tail %= QUEUE_SIZE;
+	queue->isEmpty = FALSE; // manage isEmpty
 
 	return TRUE;
 }
 
 /* Pop a pcb for a task off of the queue. */
-uint32_t pop(queue_t queue) {
+pcb_t* queue_pop(queue_t queue) {
 	// If the queue is empty, return null
 	if (queue->isEmpty) {
-		return null;
+		return NULL;
 	}
 
-	pcb_t oPopped = queue->pcbIDs[queue->head];
+	pcb_t *oPopped = queue->pcbs[queue->head];
 
 	// set new head
 	queue->head++;
@@ -50,12 +56,53 @@ void queue_init(queue_t queue) {
 
 /* Return the size of the queue */
 uint32_t queue_size(queue_t queue) {
-	return head - tail;
+	uint32_t head = queue->head;
+	uint32_t tail = queue->tail;
+	return (queue->isEmpty) ? 0 : 
+						(head < tail) ? tail-head : tail + QUEUE_SIZE - head;
 }
 
+/* DEBUG
+void queue_print(queue_t queue) {
+	uint32_t i;
+	printf("queue with %d members.\n\t\t", queue_size(queue));
+
+	for(i = 0; i < QUEUE_SIZE; i++) {
+		if(i == queue->head && i == queue->tail) {
+			printf("HDTL->");
+		}
+		else if(i == queue->head) {
+			printf("HEAD->");
+		}
+		else if(i == queue->tail) {
+			printf("TAIL->");
+		}
+		else {
+			printf("%4d->", i);
+		}
+	}
+	printf("\n");
+} */
+
+/* DEBUG
 int main() {
-	queue_t queue;
-	queue = malloc(sizeof(queue_t));
+	struct queue q_struct; //force static allocation
+	queue_t q = &q_struct;
+	int i;
 
-	return 0;
-}
+	queue_init(q); // should have q of size 5
+
+	printf("testing QUEUE_SIZE enqueues\n");
+	for(i = 0; i < QUEUE_SIZE; i++) {
+		printf("enqueue");
+		queue_push(q, (pcb_t *) &i);
+		queue_print(q);	
+	}
+	for(i = 0; i < QUEUE_SIZE; i++) {
+		printf("dequeue");
+		queue_pop(q
+			);
+		queue_print(q);	
+	}
+
+}*/
