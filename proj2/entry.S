@@ -27,9 +27,9 @@ scheduler_entry:
 	# set stack to current_running at where eflags should be
 	leal 4(current_running), %esp
 	# pop eflags off stack
-	popfd
+	popfl
 	# pop all the other registers (omitting esp) off stack
-	popad
+	popal
 	movl 20(current_running), %esp
 
 	# push eip of process to run next
@@ -49,7 +49,7 @@ save_pcb:
 	# set stack to current_running at where eax should be
 	leal 40(current_running), %esp
 	# save registers
-	pushad
+	pushal
 	# move esp stored in eflags spot to esp spot
 	movl 4(current_address), 20(current_address)
 	# save eflags

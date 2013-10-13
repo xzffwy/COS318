@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "kernel.h"
+#include "queue.h"
 
 /* Number of times scheduler() was called */
 extern int scheduler_count;

@@ -4,9 +4,13 @@
 #define QUEUE_H
 
 #define QUEUE_SIZE 1 //TODO: define this dynamically!!!
-// DEBUG #define QUEUE_SIZE 5
 
-typedef struct queue *queue_t;
+typedef struct queue {
+	pcb_t *pcbs[QUEUE_SIZE]; //array of pcb_t pointers
+	uint32_t head;
+	uint32_t tail;
+	bool_t isEmpty;
+} *queue_t;
 
 
 /* Push the pcb for a task onto the queue. Return true if successful, or false if full */

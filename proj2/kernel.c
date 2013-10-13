@@ -11,11 +11,6 @@
 
 pcb_t *current_running;
 
-uint32_t num_tasks = NUM_TASKS;
-
-struct queue ready_q;
-struct queue blocked_q;
-
 /* This function is the entry point for the kernel
  * It must be the first function in the file
  */
@@ -24,6 +19,8 @@ void _start(void)
     /* Set up the single entry-point for system calls */
     *ENTRY_POINT = &kernel_entry;
 
+    struct queue ready_q;
+    struct queue blocked_q;
     ready_queue = &ready_q;
     blocked_queue = &blocked_q;
     queue_init(ready_queue);
@@ -40,7 +37,7 @@ void _start(void)
     	iStackTop += STACK_SIZE;
     	process++;
 
-    	task_info *thisTask = task[iProcessIndex];
+    	struct task_info *thisTask = task[iProcessIndex];
 
     	process->esp = iStackTop;
     	process->ebp = iStackTop;

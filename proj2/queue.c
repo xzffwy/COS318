@@ -3,13 +3,6 @@
 #include "queue.h"
 #include "common.h"
 
-struct queue {
-	pcb_t *pcbs[QUEUE_SIZE]; //array of pcb_t pointers
-	uint32_t head;
-	uint32_t tail;
-	bool_t isEmpty;
-};
-
 /* Push the pcb for a task onto the queue. Return true if successful, or false if full */
 bool_t queue_push(queue_t queue, pcb_t *pcb) {
 	// If the queue is full, return false
