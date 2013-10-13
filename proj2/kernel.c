@@ -57,8 +57,8 @@ void _start(void)
     	// TO-DO: maybe consider thread type?
     	queue_push(ready_queue, process);
 
-        print_str(iProcessIndex+1, 0, "new process with instruction pointer "); //DEBUG
-        print_hex(iProcessIndex+1, 37, process->eip);
+        /*print_str(iProcessIndex+1, 0, "new process with instruction pointer "); //DEBUG
+        print_hex(iProcessIndex+1, 37, process->eip);*/
 
     	process++;
 

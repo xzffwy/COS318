@@ -36,7 +36,7 @@ void _start(void)
         draw(locx, locy, TRUE);
         print_counter();
         delay(DELAY_VAL);
-        yield();
+        //yield();
     }
 }
 

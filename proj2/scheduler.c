@@ -32,6 +32,9 @@ void do_yield(void)
 
 	// call save_pcb, which should find the EIP from two calls up
 	save_pcb();
+	print_str(8, 0, "just saved a task with eip "); //DEBUG
+    print_hex(9, 0, current_running->eip);
+    //while(1);
 
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);

@@ -62,12 +62,12 @@ save_pcb:
 	pushal
 
 	# save eip
-	movl 40(%esp), %ecx
-	movl %ecx, current_running
-	# save correct esp from where do_yield was called where eflags should be
-	leal 40(%esp), %eax
-	movl current_running, %ecx
-	movl %eax, 4(%ecx)
+	movl 36(%esp), %ecx
+	movl current_running, %eax
+	movl %ecx, (%eax)
+	# save correct esp from where do_yield. use the eflags entry as temp storage
+	leal 40(%esp), %ecx
+	movl %ecx, 4(%eax)
 
 	# restore registers
 	popal
@@ -77,16 +77,16 @@ save_pcb:
 	leal 40(%esp), %esp
 	# save registers
 	pushal
-	# move esp stored in eflags spot to esp spot
+	# move esp value stored in eflags spot to correct esp spot
 	movl current_running, %esp
 	movl 4(%esp), %eax
 	movl %eax, 20(%esp)
 	# save eflags
-	addl $0x8, %esp
+	leal 8(%esp), %esp
 	pushfl
 	# set stack back
 	movl current_running, %eax
 	movl 20(%eax), %esp
-	subl $0x8, %esp
+	leal -8(%esp), %esp
 
 	ret
