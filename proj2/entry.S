@@ -66,7 +66,7 @@ save_pcb:
 	movl current_running, %eax
 	movl %ecx, (%eax)
 	# save correct esp from where do_yield. use the eflags entry as temp storage
-	leal 40(%esp), %ecx
+	leal 40(%esp), %ecx # J: subtract off 4?
 	movl %ecx, 4(%eax)
 
 	# restore registers
@@ -74,7 +74,7 @@ save_pcb:
 
 	# set stack to current_address at where eax should be
 	movl current_running, %esp
-	leal 40(%esp), %esp
+	leal 40(%esp), %esp   # J: subtract off 4?
 	# save registers
 	pushal
 	# move esp value stored in eflags spot to correct esp spot
@@ -82,7 +82,7 @@ save_pcb:
 	movl 4(%esp), %eax
 	movl %eax, 20(%esp)
 	# save eflags
-	leal 8(%esp), %esp
+	leal 8(%esp), %esp  # J: subtract off 4?
 	pushfl
 	# set stack back
 	movl current_running, %eax

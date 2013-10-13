@@ -27,6 +27,14 @@ void lock_acquire(lock_t * l)
             do_yield();
         l->status = LOCKED;
     } else {
+        // case 1: lock is free
+        if (l->status == UNLOCKED)
+            return;
+        // case 2: lock is owned
+        //CHECK THIS.  WILL IT SAVE EIP PROPERLY?  WILL IT JUMP TO NEW TASK?
+        block();
+
+
         // if owner is -1 or status = UNBLOCKED -> lock_owner = running_task from kernel.c, status=BLOCKED, return
         // if owner is running_task, then wtf owner u crazy r sumtin?, i guess return
         // if neither of these are true, enqueue running task on blocked queue and call save_pcb, then call scheduler
@@ -38,6 +46,13 @@ void lock_release(lock_t * l)
     if (SPIN) {
         l->status = UNLOCKED;
     } else {
+        // check for blocked tasks
+        if (blocked_tasks)
+            unblock();
+        // if none, free lock
+        else
+            l->status = UNLOCKED;
+
         // if blocked queue has a process, give it the lock and put it on the ready queue
         // else, owner = -1, status = UNBLOCKED
     }

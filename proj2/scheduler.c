@@ -18,7 +18,9 @@ void scheduler(void)
     print_hex(6, 0, current_running->eip);
 
     // if ret of pop is null, then all tasks have exited so just loop forever
-    while (!current_running){ ; }
+    while (!current_running){ 
+    	print_str(0, 0, "What is my purpose in the absence of tasks?"); 
+    }
 
     current_running->state = PROCESS_RUNNING;
 
@@ -27,14 +29,14 @@ void scheduler(void)
 
 void do_yield(void)
 {
-	// set pcb state
-	current_running->state = PROCESS_READY;
-
 	// call save_pcb, which should find the EIP from two calls up
 	save_pcb();
-	print_str(8, 0, "just saved a task with eip "); //DEBUG
-    print_hex(9, 0, current_running->eip);
-    //while(1);
+
+	// set pcb state
+	current_running->state = PROCESS_READY;
+	print_str(8, 0, "just saved a thread with eip: "); //DEBUG
+    print_hex(8, 30, current_running->eip); //DEBUG
+    while(1) {;} //DEBUG
 
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);
@@ -42,26 +44,27 @@ void do_yield(void)
 	// call scheduler_entry
 	scheduler_entry();
 
-	// shouldn't get here i don't think
+	// should never reach here
 	ASSERT(0);
 }
 
 void do_exit(void)
 {
+	current_running->state = PROCESS_EXITED;
 	scheduler_entry();
 }
 
 void block(void)
 {
-	current_running->state = PROCESS_BLOCKED;
-
 	save_pcb();
+
+	current_running->state = PROCESS_BLOCKED;
 
 	queue_push(blocked_queue, current_running);
 
 	scheduler_entry();
 
-	// shouldn't get here i don't think
+	// should never reach here
 	ASSERT(0);
 }
 

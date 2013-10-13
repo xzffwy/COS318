@@ -30,6 +30,7 @@ typedef enum {
 	PROCESS_BLOCKED,
 	PROCESS_READY,
 	PROCESS_RUNNING,
+	PROCESS_EXITED,
 } process_state;
 
 typedef struct pcb {
