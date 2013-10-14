@@ -44,7 +44,6 @@ LDFLAGS += -melf_i386
 # Specify a location on a per-target basis
 LDFLAGS += -Ttext
 
-
 ## First Makefile target
 # Create a 1.44M floppy image for bochs etc.
 floppy.img : image
@@ -80,7 +79,7 @@ process3 : process3.o syslib.o util.o
 
 # Override the default implicit rule to call $(LD) directly
 % : %.o
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ -g -o $@
 
 
 hello : hello1.c hello2.S
@@ -90,7 +89,7 @@ hello : hello1.c hello2.S
 # Copy the image to the USB drive in the fishbowl lab
 # WARNING: make sure this is right before you make this target on another system
 boot : image
-	cat image > /dev/sdf
+	cat image > /dev/sdg
 .PHONY : boot
 
 # Clean up!

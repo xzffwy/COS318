@@ -24,8 +24,8 @@ void thread5(void)
 {
 	rec_time = get_timer() - rec_time;
 
-	print_str(MAXROW-2, 0, display_str);
-	print_int(MAXROW-2, strlen(display_str), (int) rec_time);
+	print_str(0, 0, display_str);
+	print_int(0, strlen(display_str), (int) recorded_time);
 
 	do_exit();
 }

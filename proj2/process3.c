@@ -21,8 +21,8 @@ void _start(void)
 	}
 	/* second process calculates difference in time then exits */
 	else {
-		print_str(MAXROW-7, 0, display_str);
-		print_int(MAXROW-7, strlen(display_str), (int) (time - recorded_time));
+		print_str(0, strlen(display_str) + 10, display_str);
+		print_int(0, 2 * strlen(display_str) + 10, (int) (time - recorded_time));
     	exit();
 	}
 	
