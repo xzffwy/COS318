@@ -2,8 +2,6 @@
 #include "scheduler.h"
 #include "util.h"
 
-#define MAXROW 25
-
 uint64_t rec_time;
 char * display_str = "Cycles required per do_yield(): ";
 

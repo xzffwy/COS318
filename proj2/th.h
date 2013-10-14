@@ -16,4 +16,12 @@ void thread3(void);
 void thread4(void);
 void thread5(void);
 
+/* Threads for design review example */
+void thread11(void);
+void thread12(void);
+void thread13(void);
+void thread14(void);
+
+
+
 #endif
