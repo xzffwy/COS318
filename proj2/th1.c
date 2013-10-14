@@ -19,6 +19,7 @@ void clock_thread(void)
     unsigned long long int ticks;
     unsigned int start_time;
 
+
     /* To show time since last boot, remove all references to start_time */
     ticks = get_timer() >> 20;  /* divide on 2^20 = 10^6 (1048576) */
     start_time = ((int) ticks) / MHZ;   /* divide on CPU clock frequency in

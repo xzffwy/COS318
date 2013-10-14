@@ -47,7 +47,7 @@ void do_yield(void)
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);
 
-	// call scheduler_entry
+	// call scheduler_entry to start next task
 	scheduler_entry();
 
 	// should never reach here
