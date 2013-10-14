@@ -1,9 +1,12 @@
-Design decisions:
-one stack per task (regardless of user process or kernel thread).  any information needed for a context switch (i.e. extra base pointers/instruction pointers) are stored on the top of a task's stack.
+We used one stack per task, regardless of whether it was a user thread or kernel thread. When performing a context switch, the kernel piggy backs off of the stack currently being saved and/or restored in order to save values, and access old values of importance such as EIP, EBP and ESP.
 
-our queue data type (used for ready queue and for the lock's blocked queue) is a statically allocated array of pcb pointers.
-this is done in kernel.c to allow access to NUM_TASKS. there is a pointer in the queue struct directed to this array.
+Our queue data type (used for ready queue and for the lock's blocked queue) is built using an array. The queue struct is statically allocated in kernel.c. Similarly, the array underlying the implementation of the queue is statically allocated in kernel.c
+The pointer in the queue struct is then pointed towards this statically allocated array. This process is repeated once for both the ready and blocked queues.
 
-used a function for saving_context for
-1) modular code
-2) prevents first task or exiting task from having to save
+Instead of saving our context in scheduler_entry, we wrote a seperate function save_pcb() which is called only from do_yield() and block(). This way, we do not have to save context on exit or perform any sort of weird logic to run the first process.
+
+To implement mutual exclusion, we simply had a ready queue which stores threads trying to acquire the lock when it is already held by another process. When the lock is released, it pops the next blocked thread to the ready queue or unlocks the lock if the blocked queue is empty. This implementation assumes that there is only one lock and it is not initialized more than once. We more clearly state our assumptions in lock.c.
+
+To implement timing with thread4/thread5, we simply record the cycles since boot in thread 4, do_yield, and then compute the new number of cycles since boot and print the result. To compute timing in process3, we simply do the same thing, storing cycles in a static variable accessed by each thread through the process3 code.
+
+To our knowledge, everything works.

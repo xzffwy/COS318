@@ -4,8 +4,10 @@
 
 #define MAXROW 25
 
+#define INT_MAX_VAL 18446744073709551615U
+
 char * display_str = "Cycles required per yield(): ";
-extern uint64_t recorded_time = 18446744073709551615; //maxval of 64-bit int
+static uint64_t recorded_time = INT_MAX_VAL; //maxval of 64-bit int
 
 void _start(void)
 {
