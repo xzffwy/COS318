@@ -63,13 +63,12 @@ scheduler_entry:
 	# return to new task
 	ret
 
-# Saves the pcb of the currently running process. Use EIP from two stack calls up (should be esp + 8)
-
-
+# Saves the pcb of the currently running process. Use EIP from above stack base pointer
 	.globl save_pcb
 save_pcb:
-	# push all the registers on the stack
-	pushal
+	# push some registers to clear temp var space
+	pushl %ecx
+	pushl %eax
 
 	# save eip
 	movl 4(%ebp), %ecx
@@ -81,7 +80,9 @@ save_pcb:
 	movl %ecx, 4(%eax)
 
 	# restore registers
-	popal
+	popl %eax
+	popl %ecx
+
 	# save old stack pointer
 	pushl %esp
 	# save old base pointer
@@ -89,7 +90,7 @@ save_pcb:
 	# set base pointer to esp
 	movl %esp, %ebp
 
-	# set stack to current_address at where eax should be
+	# set stack to current_running offset to where eax should be
 	movl current_running, %esp
 	leal 40(%esp), %esp
 
