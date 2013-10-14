@@ -14,9 +14,6 @@ void scheduler(void)
 
     // pop new pcb off ready queue
     current_running = queue_pop(ready_queue);
-    
-    /*DEBUG print_str(5, 0, "just popped a task with eip ");
-    print_hex(6, 0, current_running->eip);*/
 
     // if ret of pop is null, then all tasks have exited so just loop forever
     while (!current_running){ 
@@ -30,19 +27,10 @@ void scheduler(void)
 
 void do_yield(void)
 {
-	// call save_pcb, which should find the EIP from above the base pointer
-	if (current_running->isKernel) {
-		save_pcb_thread();
-	}
-	else {
-		save_pcb_proc();
-	}
+	save_pcb();
 
 	// set pcb state
 	current_running->state = PROCESS_READY;
-
-	/*DEBUG print_str(8, 0, "just saved a task with eip ");
-    print_hex(9, 0, current_running->eip);*/
 
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);
@@ -62,12 +50,7 @@ void do_exit(void)
 
 void block(void)
 {
-	if (current_running->isKernel) {
-		save_pcb_thread();
-	}
-	else {
-		save_pcb_proc();
-	}
+	save_pcb();
 
 	current_running->state = PROCESS_BLOCKED;
 
