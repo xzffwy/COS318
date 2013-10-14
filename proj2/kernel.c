@@ -43,6 +43,9 @@ void _start(void)
     static pcb_t pcbs[NUM_TASKS];
     pcb_t *process = &pcbs[0];
 
+    /* check that we won't exceed STACK_MAX */
+    ASSERT(STACK_MIN + NUM_TASKS * STACK_SIZE <= STACK_MAX);
+
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	struct task_info *thisTask = task[iProcessIndex];
         // populate instance variables
