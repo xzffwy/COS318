@@ -36,10 +36,6 @@ void _start(void)
         draw(locx, locy, TRUE);
         print_counter();
         delay(DELAY_VAL);
-<<<<<<< HEAD
-=======
-        asm("xchg %bx, %bx");
->>>>>>> more code clean-up
         yield();
     }
 }
