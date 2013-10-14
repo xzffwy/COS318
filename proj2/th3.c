@@ -25,7 +25,7 @@ void thread5(void)
 	rec_time = get_timer() - rec_time;
 
 	print_str(0, 0, display_str);
-	print_int(0, strlen(display_str), (int) recorded_time);
+	print_int(0, strlen(display_str), (int) rec_time);
 
 	do_exit();
 }
