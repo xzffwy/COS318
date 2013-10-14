@@ -1,0 +1,9 @@
+Design decisions:
+one stack per task (regardless of user process or kernel thread).  any information needed for a context switch (i.e. extra base pointers/instruction pointers) are stored on the top of a task's stack.
+
+our queue data type (used for ready queue and for the lock's blocked queue) is a statically allocated array of pcb pointers.
+this is done in kernel.c to allow access to NUM_TASKS. there is a pointer in the queue struct directed to this array.
+
+used a function for saving_context for
+1) modular code
+2) prevents first task or exiting task from having to save
