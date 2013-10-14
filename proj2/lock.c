@@ -1,6 +1,11 @@
 /* lock.c: mutual exclusion
  * If SPIN is false, lock_acquire() should block the calling process until its request can be satisfied
  * Your solution must satisfy the FIFO fairness property
+ *
+ *  It is assumed that only one process will attempt to initialize a lock,
+ *                that processes will call lock_acquire only on an initialized lock
+ *                that processes will call lock_release after lock_acquire (and before exiting)
+ *                that processes will release a lock before attempting to reacquire it
  */
 
 #include "common.h"
@@ -33,13 +38,7 @@ void lock_acquire(lock_t * l)
             return;
         }
         // case 2: lock is owned
-        //CHECK THIS.  WILL IT SAVE EIP PROPERLY?  WILL IT JUMP TO NEW TASK?
-        print_str(18, 0, "wtf I just got lock-blocked");
         block();
-
-        // if owner is -1 or status = UNBLOCKED -> lock_owner = running_task from kernel.c, status=BLOCKED, return
-        // if owner is running_task, then wtf owner u crazy r sumtin?, i guess return
-        // if neither of these are true, enqueue running task on blocked queue and call save_pcb, then call scheduler
     }
 }
 
@@ -50,12 +49,9 @@ void lock_release(lock_t * l)
     } else {
         // check for blocked tasks
         if (blocked_tasks())
-            unblock();
-        // if none, free lock
+            unblock(); // unblock next task waiting on lock
+        // if no blocked tasks, free lock
         else
             l->status = UNLOCKED;
-
-        // if blocked queue has a process, give it the lock and put it on the ready queue
-        // else, owner = -1, status = UNBLOCKED
     }
 }

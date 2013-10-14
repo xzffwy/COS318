@@ -46,9 +46,9 @@ typedef struct pcb {
 	uint32_t eax;
 	bool_t isKernel;
 	process_state state;
-} pcb_t; // potentially add packed attribute
+} pcb_t;
 
-/* The task currently running */
+/* The task currently running.  Accessed by scheduler.c and by entry.s assembly methods */
 extern pcb_t *current_running;
 
 void kernel_entry(int fn);

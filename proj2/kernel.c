@@ -42,10 +42,10 @@ void _start(void)
     int iStackTop = STACK_MIN;
     static pcb_t pcbs[NUM_TASKS];
     pcb_t *process = &pcbs[0];
-    print_str(0, 0, "welcome to the kernel, bitch"); //DEBUG
+
     for (iProcessIndex = 0; iProcessIndex < NUM_TASKS; iProcessIndex++) {
     	struct task_info *thisTask = task[iProcessIndex];
-
+        // populate instance variables
         iStackTop += STACK_SIZE;
     	process->esp = iStackTop;
     	process->ebp = iStackTop;
@@ -59,12 +59,8 @@ void _start(void)
         process->esi = 0;
         process->eflags = 0;
         process->isKernel = (thisTask->task_type == KERNEL_THREAD) ? TRUE : FALSE;
-
-    	// TO-DO: maybe consider thread type?
+        // add to queue
     	queue_push(ready_queue, process);
-
-        /*print_str(iProcessIndex+1, 0, "new process with instruction pointer "); //DEBUG
-        print_hex(iProcessIndex+1, 37, process->eip);*/
 
     	process++;
     }

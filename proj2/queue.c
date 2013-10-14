@@ -52,7 +52,7 @@ uint32_t queue_size(queue_t queue) {
 	uint32_t head = queue->head;
 	uint32_t tail = queue->tail;
 	return (queue->isEmpty) ? 0 : 
-						(head < tail) ? tail-head : tail + queue->capacity - head;
+						(head < tail) ? (tail - head) : (tail + queue->capacity - head);
 }
 
 /* DEBUG

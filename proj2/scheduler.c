@@ -14,8 +14,9 @@ void scheduler(void)
 
     // pop new pcb off ready queue
     current_running = queue_pop(ready_queue);
-    print_str(5, 0, "just popped a task with eip "); //DEBUG
-    print_hex(6, 0, current_running->eip);
+    
+    /*DEBUG print_str(5, 0, "just popped a task with eip ");
+    print_hex(6, 0, current_running->eip);*/
 
     // if ret of pop is null, then all tasks have exited so just loop forever
     while (!current_running){ 
@@ -40,8 +41,8 @@ void do_yield(void)
 	// set pcb state
 	current_running->state = PROCESS_READY;
 
-	print_str(8, 0, "just saved a task with eip "); //DEBUG
-    print_hex(9, 0, current_running->eip);
+	/*DEBUG print_str(8, 0, "just saved a task with eip ");
+    print_hex(9, 0, current_running->eip);*/
 
 	// push the currently running process on ready queue
 	queue_push(ready_queue, current_running);
