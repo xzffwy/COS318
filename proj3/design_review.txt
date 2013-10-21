@@ -1,0 +1,25 @@
+condition:wait -- comes in with lock. lock until desired condition is true (put something on block queue)
+condition:signal -- lets something come off blocked queue
+
+semaphore: need to track if things are up or down.  these also get blocking queue
+
+http://www.cs.berkeley.edu/~kubitron/cs162/hand-outs/synch.html
+
+
+timer interrupt:
+	turn off interrupts
+	increment timer
+	call check-sleeping (wakes up tasks that are past deadline)
+	save state of current task
+	put on back of ready queue
+	load in new task
+	re-enable interrupts
+	
+cause process to sleep
+	change status to blocked. put on sleep queue. enter scheduler
+	
+cause process to wake up
+	???take off sleep queue (based on deadline). change status enqueue to ready queue???
+	
+if all sleeping:
+	call idle thread (exists already in scheduler.c).  this spins, waiting for something to enter the ready queue.  causes timer to be incremented (which works with deadlines)
