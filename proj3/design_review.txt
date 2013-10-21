@@ -8,10 +8,13 @@ http://www.cs.berkeley.edu/~kubitron/cs162/hand-outs/synch.html
 
 timer interrupt:
 	turn off interrupts
+	save state of current task (dont change flags)
+
 	increment timer
+	
 	call check-sleeping (wakes up tasks that are past deadline)
-	save state of current task
-	put on back of ready queue
+	
+	put current on back of ready queue
 	load in new task
 	re-enable interrupts
 	

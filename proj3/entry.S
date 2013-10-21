@@ -81,6 +81,11 @@
 
 /* TODO: Test current_running->nested_count, clobbering only eflags */
 #define TEST_NESTED_COUNT \
+	movl %eax, scratch; \
+	movl current_running, %eax; \
+	movl NESTED_COUNT(%eax), %eax; \
+	testl %eax; \
+	movl scratch, %eax
 	
 /** TODO end */
 
@@ -135,25 +140,46 @@ syscall_entry:
 /* TODO: Timer interrupt handler */
 	.globl    irq0_entry
 irq0_entry:
+	// eflags has been pushed
+
+	ENTER_CRITICAL
+
 	SEND_EOI // Acknowledge the hardware interrupt
-	/* Increment time_elapsed */	
+
+	pushl %eax
 
 	/* Increment disable_count to reflect the fact that interrupts are off */
+	movl disable_count, %eax
+	movl (%eax), %eax
+	incl %eax
+	movl %eax, disable_count // Not sure if this overwrites pointer or memory
+
+	/* Increment time_elapsed */
+	movl time_elapsed, %eax
+	movl (%eax), %eax
+	incl %eax
+	movl %eax, time_elapsed // Not sure if this overwrites pointer or memory
+
+	popl %eax
 	
-	/* Test nested_count */
+	TEST_NESTED_COUNT
 	
 	/* nested_count not zero, so do nothing */
 	jnz return
 
-	/* do system call */
-	
+	/* call scheduler */
 	
 return:
-	/* check the sleeping processes and wake them up on time */
 	
 	/* Decrement disable_count in anticipation of iret */
+	pushl %eax
+	movl disable_count, %eax
+	movl (%eax), %eax
+	decl %eax
+	movl %eax, disable_count // Not sure if this overwrites pointer or memory
+	popl %eax
 	
-	iret
+	iret // return from interrupt call, pop eflags off stack
 
 /** TODO end */
 
