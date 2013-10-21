@@ -97,23 +97,37 @@ void lock_release(lock_t * l){
 
 /* TODO: Initialize a condition variable */
 void condition_init(condition_t * c){
-
+	// init a lock and acquire it
 }
 
 /* TODO: Release lock m and block the thread (enqueued on c).  When unblocked,
    re-acquire m */
 void condition_wait(lock_t * m, condition_t * c){
-  
+	// disable interrupts
+
+	// release lock
+	//sleep
+	// acquire lock
+
+	// enable interrupts
 }
 
 /* TODO: Unblock the first thread waiting on c, if it exists */
 void condition_signal(condition_t * c){
- 
+	// disable int
+
+	// wake up
+
+	// enable int
 }
 
 /* TODO: Unblock all threads waiting on c */
 void condition_broadcast(condition_t * c){
-  
+	// disable int
+
+	// wake all on queue
+
+	// enable int
 }
 
 /* TODO: Initialize a semaphore with the specified value. value must be >= 0 */
@@ -123,12 +137,13 @@ void semaphore_init(semaphore_t * s, int value){
 
 /* TODO: Increment the semaphore value atomically */
 void semaphore_up(semaphore_t * s){
-  
+	// s++
 }
 
 /* TODO: Block until the semaphore value is greater than zero and decrement it */
 void semaphore_down(semaphore_t * s){
-  
+	// while 0 -> sleep
+	// s--
 }
 
 /* TODO: Initialize a barrier.  n is number of threads that rendezvous at the
