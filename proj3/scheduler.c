@@ -41,6 +41,7 @@ void do_sleep(int milliseconds){
   uint64_t deadline;
   
   deadline = time_elapsed + milliseconds;
+  // instead, put on sleeping queue
   while (time_elapsed < deadline){}
  
 }

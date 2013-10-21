@@ -157,17 +157,26 @@ irq0_entry:
 	/* Increment time_elapsed */
 	movl time_elapsed, %eax
 	movl (%eax), %eax
-	incl %eax
+	incl %eax // TODO: deal with overflow. time_elapsed is 64-bit so inc higer order bits if carry flag is raised
 	movl %eax, time_elapsed // Not sure if this overwrites pointer or memory
 
 	popl %eax
 	
+	// check_sleeping
+
 	TEST_NESTED_COUNT
-	
+
 	/* nested_count not zero, so do nothing */
 	jnz return
 
-	/* call scheduler */
+	/* enter kernel */
+	SAVE_CONTEXT(USER)
+	RESTORE_CONTEXT(KERNEL)
+
+	// scheduler_entry
+
+	SAVE_CONTEXT(KERNEL)
+	RESTORE_CONTEXT(USER)
 	
 return:
 	
@@ -179,6 +188,8 @@ return:
 	movl %eax, disable_count // Not sure if this overwrites pointer or memory
 	popl %eax
 	
+	LEAVE_CRITICAL
+
 	iret // return from interrupt call, pop eflags off stack
 
 /** TODO end */
