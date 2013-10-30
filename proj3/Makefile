@@ -39,7 +39,7 @@ CFLAGS += -m32
 # No external environment
 CFLAGS += -ffreestanding
 # Turn on all warnings and make them errors
-CFLAGS += -Wall -Wextra -Werror
+CFLAGS += -Wall -Wextra #-Werror
 # Turn on optimization
 CFLAGS += -O2 -fomit-frame-pointer -fno-builtin
 # -fstack-protector is not compatible with -ffreestanding
@@ -88,7 +88,7 @@ process1 : process1.o syslib.o util.o printf.o
 
 process2 : LDFLAGS += $(PROC2_ADDR)
 process2 : process2.o syslib.o util.o printf.o helper.o
-	
+
 # How to compile a C file
 %.o : %.c
 	$(CC) $(CFLAGS) $<

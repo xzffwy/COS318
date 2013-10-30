@@ -84,7 +84,7 @@
 	movl %eax, scratch; \
 	movl current_running, %eax; \
 	movl NESTED_COUNT(%eax), %eax; \
-	testl %eax; \
+	testl %eax, %eax; \
 	movl scratch, %eax
 	
 /** TODO end */
