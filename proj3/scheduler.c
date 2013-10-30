@@ -19,12 +19,14 @@ volatile uint64_t time_elapsed;
 
 /* TODO: Round-robin scheduling: Save current_running before preempting */
 void put_current_running(){
+  // TO-DO: Do we want to wake up sleeping processes here as well?
   enqueue(&ready_queue, (node_t *)current_running);
 }
 
 /* Change current_running to the next task */
 void scheduler(){
   ASSERT(disable_count);
+  check_sleeping(); // wake up sleeping processes
   while (is_empty(&ready_queue)){     
     leave_critical();
     enter_critical();
@@ -34,20 +36,46 @@ void scheduler(){
   ++current_running->entry_count;
 }
 
+int lte_deadline(node_t *a, node_t *b) {
+  pcb_t *x = (pcb_t *)a;
+  pcb_t *y = (pcb_t *)b;
+
+  if (x->deadline <= y->deadline) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
 /* TODO: Blocking sleep. Caution: this function currently cannot be pre-empted! */
 void do_sleep(int milliseconds){
-  
+  enter_critical();
+
   ASSERT( !disable_count );
   uint64_t deadline;
   
   deadline = time_elapsed + milliseconds;
-  // instead, put on sleeping queue
-  while (time_elapsed < deadline){}
- 
+  
+  current_running->deadline = deadline;
+
+  enqueue_sort(&sleep_wait_queue, (node_t *)current_running, (node_lte)&lte_deadline);
+
+  scheduler_entry();
+  leave_critical(); 
 }
 
 /* TODO: Check if we can wake up sleeping processes */
 void check_sleeping(){
+  pcb_t *sleeping;
+
+  while (!is_empty(&sleep_wait_queue)) {
+    sleeping = (pcb_t *)peek(&sleep_wait_queue);
+    if (sleeping->deadline >= time_elapsed) {
+      enqueue(&ready_queue, dequeue(&sleep_wait_queue));
+    } else {
+      return;
+    }
+  }
 
 }
 
