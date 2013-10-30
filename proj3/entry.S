@@ -93,6 +93,9 @@
 // Temporary storage for 32-bit registers
 scratch:
 	.long    0
+// Temporary storage for 32-bit registers
+scratch2:
+	.long    0
 // Temporary storage for syscall return value
 return_value:
 	.long    0
@@ -147,14 +150,23 @@ irq0_entry:
 	SEND_EOI // Acknowledge the hardware interrupt
 
 	movl %eax, scratch
+	movl %ecx, sctratch2
 
 	/* Increment time_elapsed */
-	movl time_elapsed, %eax
-	movl (%eax), %eax
-	incl %eax // TODO: deal with overflow. time_elapsed is 64-bit so inc higer order bits if carry flag is raised
-	movl %eax, time_elapsed // Not sure if this overwrites pointer or memory
+	movl time_elapsed, %ecx
+	movl (%ecx), %eax // low-order bit
+	incl %eax // increment low-order bit
+	movl %eax, time_elapsed // save result (CHECK)
 
+	jnc post_carry //if cf = 0 (no-carry), jump to post_carry
+	//else
+	movl 4(%ecx), %eax // high-order bit
+	incl %eax // increment high-order bit
+	movl %eax, 4(%ecx) // save-result
+post_carry:
 	movl scratch, %eax
+	movl scratch2, %ecx
+
 	
 	// check_sleeping
 
