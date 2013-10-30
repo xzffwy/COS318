@@ -142,7 +142,7 @@ void semaphore_up(semaphore_t * s){
 
 /* TODO: Block until the semaphore value is greater than zero and decrement it */
 void semaphore_down(semaphore_t * s){
-	// while 0 -> sleep
+	// while 0 -> block
 	// s--
 }
 

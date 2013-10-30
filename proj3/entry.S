@@ -148,12 +148,6 @@ irq0_entry:
 
 	pushl %eax
 
-	/* Increment disable_count to reflect the fact that interrupts are off */
-	movl disable_count, %eax
-	movl (%eax), %eax
-	incl %eax
-	movl %eax, disable_count // Not sure if this overwrites pointer or memory
-
 	/* Increment time_elapsed */
 	movl time_elapsed, %eax
 	movl (%eax), %eax
@@ -179,14 +173,6 @@ irq0_entry:
 	RESTORE_CONTEXT(USER)
 	
 return:
-	
-	/* Decrement disable_count in anticipation of iret */
-	pushl %eax
-	movl disable_count, %eax
-	movl (%eax), %eax
-	decl %eax
-	movl %eax, disable_count // Not sure if this overwrites pointer or memory
-	popl %eax
 	
 	LEAVE_CRITICAL
 
