@@ -146,7 +146,7 @@ irq0_entry:
 
 	SEND_EOI // Acknowledge the hardware interrupt
 
-	pushl %eax
+	movl %eax, scratch
 
 	/* Increment time_elapsed */
 	movl time_elapsed, %eax
@@ -154,7 +154,7 @@ irq0_entry:
 	incl %eax // TODO: deal with overflow. time_elapsed is 64-bit so inc higer order bits if carry flag is raised
 	movl %eax, time_elapsed // Not sure if this overwrites pointer or memory
 
-	popl %eax
+	movl scratch, %eax
 	
 	// check_sleeping
 
@@ -165,11 +165,11 @@ irq0_entry:
 
 	/* enter kernel */
 	SAVE_CONTEXT(USER)
-	RESTORE_CONTEXT(KERNEL)
+	RESTORE_STACK(KERNEL)
 
 	// scheduler_entry
 
-	SAVE_CONTEXT(KERNEL)
+	SAVE_STACK(KERNEL)
 	RESTORE_CONTEXT(USER)
 	
 return:
