@@ -49,9 +49,9 @@ int lte_deadline(node_t *a, node_t *b) {
 
 /* TODO: Blocking sleep. Caution: this function currently cannot be pre-empted! */
 void do_sleep(int milliseconds){
-  enter_critical();
-
   ASSERT( !disable_count );
+  
+  enter_critical();
   uint64_t deadline;
   
   deadline = time_elapsed + milliseconds;
