@@ -157,7 +157,7 @@ irq0_entry:
 	movl (%ecx), %eax // low-order bit
 	incl %eax // increment low-order bit
 	movl %eax, time_elapsed // save result (CHECK)
-	
+
 	jnc post_carry //if cf = 0 (no-carry), jump to post_carry
 	//else
 	movl 4(%ecx), %eax // high-order bit
@@ -179,7 +179,7 @@ post_carry:
 	SAVE_CONTEXT(USER)
 	RESTORE_STACK(KERNEL)
 
-	// scheduler_entry
+	call scheduler_entry
 
 	SAVE_STACK(KERNEL)
 	RESTORE_CONTEXT(USER)
