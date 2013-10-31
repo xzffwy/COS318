@@ -150,7 +150,7 @@ irq0_entry:
 	SEND_EOI // Acknowledge the hardware interrupt
 
 	movl %eax, scratch
-	movl %ecx, sctratch2
+	movl %ecx, scratch2
 
 	/* Increment time_elapsed */
 	movl time_elapsed, %ecx

@@ -4,6 +4,7 @@
 #define TH_H
 
 // Prototypes
-void noop_thread1(void);
+void thread_1(void);
+void thread_2(void);
 
 #endif
