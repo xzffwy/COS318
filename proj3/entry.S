@@ -157,9 +157,8 @@ irq0_entry:
 	movl (%ecx), %eax // low-order bit
 	incl %eax // increment low-order bit
 	movl %eax, time_elapsed // save result (CHECK)
-
-	testl %eax, %eax
-	jnz post_carry //if cf = 0 (no-carry), jump to post_carry
+	
+	jnc post_carry //if cf = 0 (no-carry), jump to post_carry
 	//else
 	movl 4(%ecx), %eax // high-order bit
 	incl %eax // increment high-order bit
