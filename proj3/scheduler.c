@@ -30,6 +30,7 @@ void scheduler(){
   while (is_empty(&ready_queue)){     
     leave_critical();
     enter_critical();
+    check_sleeping();
   }
   current_running = (pcb_t *) dequeue(&ready_queue);
   ASSERT(NULL != current_running);
