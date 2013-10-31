@@ -50,7 +50,7 @@ int lte_deadline(node_t *a, node_t *b) {
 /* TODO: Blocking sleep. Caution: this function currently cannot be pre-empted! */
 void do_sleep(int milliseconds){
   ASSERT( !disable_count );
-  
+
   enter_critical();
   uint64_t deadline;
   
@@ -70,7 +70,7 @@ void check_sleeping(){
 
   while (!is_empty(&sleep_wait_queue)) {
     sleeping = (pcb_t *)peek(&sleep_wait_queue);
-    if (sleeping->deadline >= time_elapsed) {
+    if (sleeping->deadline <= time_elapsed) {
       enqueue(&ready_queue, dequeue(&sleep_wait_queue));
     } else {
       return;
