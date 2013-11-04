@@ -158,11 +158,11 @@ irq0_entry:
 	incl %eax // increment low-order bit
 	movl %eax, time_elapsed // save result (CHECK)
 
-	jnc post_carry //if cf = 0 (no-carry), jump to post_carry
-	//else
-	movl 4(%ecx), %eax // high-order bit
-	incl %eax // increment high-order bit
-	movl %eax, 4(%ecx) // save-result
+	# jnc post_carry //if cf = 0 (no-carry), jump to post_carry
+	# //else
+	# movl 4(%ecx), %eax // high-order bit
+	# incl %eax // increment high-order bit
+	# movl %eax, 4(%ecx) // save-result
 post_carry:
 	movl scratch, %eax
 	movl scratch2, %ecx

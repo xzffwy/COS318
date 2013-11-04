@@ -26,11 +26,11 @@ void put_current_running(){
 /* Change current_running to the next task */
 void scheduler(){
   ASSERT(disable_count);
-  check_sleeping(); // wake up sleeping processes
+  //check_sleeping(); // wake up sleeping processes
   while (is_empty(&ready_queue)){     
     leave_critical();
     enter_critical();
-    check_sleeping();
+    //check_sleeping();
   }
   current_running = (pcb_t *) dequeue(&ready_queue);
   ASSERT(NULL != current_running);
