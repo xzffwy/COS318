@@ -1,0 +1,9 @@
+Disclaimer:
+We never tested our code on a lab pc.  We tried to develop/test on lab pcs at numerous times during Sunday, 11/3 (see piazza/email), but in all situations there wasn't enough shared memory remaining for us to build an image or save changes to our code.  We developed on Rob's linux desktop and tested our code on virtualbox.
+
+Design decisions:
+
+check_sleeping is called in IRQ0 to assure that a sleeping process is enqueued as soon as its deadline's expired, and before any other process is enqueued unfairly.
+
+we use critical sections any time a kernel data structure is modified and try to avoid them elsewhere (to maintain liveness).
+
