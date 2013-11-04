@@ -20,17 +20,20 @@ typedef struct {
 
 /* TODO */
 typedef struct {
-  
+	node_t blocked;
 } condition_t;
 
 /* TODO */
 typedef struct {
-  
+    uint32_t val;
+	node_t wait_queue;
 } semaphore_t;
 
 /* TODO */
 typedef struct {
- 
+	uint32_t num_left;
+	node_t wait_queue;
+ 	uint32_t num_start;
 } barrier_t;
 
 // Prototypes

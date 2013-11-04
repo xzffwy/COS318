@@ -20,7 +20,8 @@ typedef enum {
     FIRST_TIME,
     READY,
     BLOCKED,
-    EXITED
+    EXITED,
+    SLEEPING
 } status_t;
 
 /* Simplified structure, used

@@ -300,7 +300,7 @@ void create_gate(struct gate *entry,    /* pointer to IDT entry */
     /* Used for debugging */
 void print_status(void)
 {
-    static char *status[] = { "First  ", "Ready", "Blocked", "Exited " };
+    static char *status[] = { "First  ", "Ready", "Blocked", "Exited ", "Sleeping" };
     int i, base;
 
     base = 13;
